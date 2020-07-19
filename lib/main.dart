@@ -38,11 +38,30 @@ The navigation delegate is set to block navigation to the youtube website.
     return a + b
   }
 
+  function fred_add_via_timeout(a, b) {
+    rubbish = setTimeout(fred_add, 3000, a, b);
+    return rubbish
+  }
+
+  // totally async
+
+  function fred_add_via_timeout_which_posts(a, b) {
+    setTimeout(fred_add_which_posts, 3000, a, b);
+  }
+
+  function fred_add_which_posts(a, b) {
+    let result = a + b
+    Toaster.postMessage(result)  // Toaster is the channel
+  }
+
+
 </script>
 
 </body>
 </html>
 ''';
+
+var lastResult = "nothing yet";
 
 class WebViewExample extends StatefulWidget {
   @override
@@ -104,6 +123,7 @@ class _WebViewExampleState extends State<WebViewExample> {
         name: 'Toaster',
         onMessageReceived: (JavascriptMessage message) {
           print('message from javascript: ${message.message}');
+          lastResult = message.message; // andy secret way to comm to other code
           Scaffold.of(context).showSnackBar(
             SnackBar(content: Text(message.message)),
           );
@@ -299,21 +319,45 @@ class SampleMenu extends StatelessWidget {
     x = 80;
     y = 1;
     // NOTE: my fred_add function has no .then so this doesn't work
-    // 
     // await controller.evaluateJavascript('fred_add($x, $y)'
     //     '.then((it) => JSON.stringify({"it" : it}))'
     //     '.then((result) => Toaster.postMessage(result))');
-    // 
+    //
     // NOTE: however this does work!
-    await controller.evaluateJavascript('Toaster.postMessage(fred_add($x, $y))');
+    await controller
+        .evaluateJavascript('Toaster.postMessage(fred_add($x, $y))');
+    // NOTE: annoying that we have to go to another dart function to get the result
+    // let's try a workaround and store the result there and access here - yes
+    // seems to work!?
+    print('andy secret result from toast is: "$lastResult"');
 
-
+    // NOTE: alert is suppressed
     // await controller
     //     .evaluateJavascript('console.log(fred_alert())'); // alert is suppressed
 
-    // final String contentBase64 =
-    //     base64Encode(const Utf8Encoder().convert(kNavigationExamplePage));
-    // await controller.loadUrl('data:text/html;base64,$contentBase64');
+    // NOTE: the result we get back is the rubbish return value of the 
+    // javascript setTimeout() call - and thus useless!
+    await controller
+        .evaluateJavascript('Toaster.postMessage(fred_add_via_timeout($x, $y))');
+    print('andy useless result from timeout toast is: "$lastResult"');
+
+    /// What we could do is have the timeout function post a message then we 
+    /// would get it - but not in here though - it would be a totally async
+    /// post of the message received elsewhere.
+    /// 
+    /// Note we don't bother posting the return result cos its useless
+    /// 
+    /// Yep, this works.
+    await controller
+        .evaluateJavascript('fred_add_via_timeout_which_posts($x, $y)');
+    
+    /// 
+    /// IDEA: perhaps we should embrace the async nature of things and send back
+    /// results encoded with special json that indicates what the result
+    /// is for, and process the results accordingly, like an event stream.
+    /// 
+    /// 
+
   }
 
   Widget _getCookieList(String cookies) {
