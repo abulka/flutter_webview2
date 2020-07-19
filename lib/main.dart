@@ -22,6 +22,24 @@ The navigation delegate is set to block navigation to the youtube website.
 <ul><a href="https://www.youtube.com/">https://www.youtube.com/</a></ul>
 <ul><a href="https://www.google.com/">https://www.google.com/</a></ul>
 </ul>
+
+<script>
+  console.log('hi andy')
+  
+  function fred() {
+    return 100
+  }
+
+  function fred_alert() {
+    alert('hi there')
+  }
+
+  function fred_add(a, b) {
+    return a + b
+  }
+
+</script>
+
 </body>
 </html>
 ''';
@@ -85,6 +103,7 @@ class _WebViewExampleState extends State<WebViewExample> {
     return JavascriptChannel(
         name: 'Toaster',
         onMessageReceived: (JavascriptMessage message) {
+          print('message from javascript: ${message.message}');
           Scaffold.of(context).showSnackBar(
             SnackBar(content: Text(message.message)),
           );
@@ -120,6 +139,7 @@ enum MenuOptions {
   listCache,
   clearCache,
   navigationDelegate,
+  andy1,
 }
 
 class SampleMenu extends StatelessWidget {
@@ -158,6 +178,9 @@ class SampleMenu extends StatelessWidget {
               case MenuOptions.navigationDelegate:
                 _onNavigationDelegateExample(controller.data, context);
                 break;
+              case MenuOptions.andy1:
+                _onAndy1(controller.data, context);
+                break;
             }
           },
           itemBuilder: (BuildContext context) => <PopupMenuItem<MenuOptions>>[
@@ -169,6 +192,10 @@ class SampleMenu extends StatelessWidget {
             const PopupMenuItem<MenuOptions>(
               value: MenuOptions.listCookies,
               child: Text('List cookies'),
+            ),
+            const PopupMenuItem<MenuOptions>(
+              value: MenuOptions.andy1,
+              child: Text('_onAndy1'),
             ),
             const PopupMenuItem<MenuOptions>(
               value: MenuOptions.clearCookies,
@@ -257,6 +284,36 @@ class SampleMenu extends StatelessWidget {
     final String contentBase64 =
         base64Encode(const Utf8Encoder().convert(kNavigationExamplePage));
     await controller.loadUrl('data:text/html;base64,$contentBase64');
+  }
+
+  void _onAndy1(WebViewController controller, BuildContext context) async {
+    print('invoking _onAndy1');
+
+    await controller
+        .evaluateJavascript('console.log("invoking console from flutter")');
+    await controller.evaluateJavascript('console.log(fred())');
+
+    var x = 10, y = 20;
+    await controller.evaluateJavascript('console.log(fred_add($x, $y))');
+
+    x = 80;
+    y = 1;
+    // NOTE: my fred_add function has no .then so this doesn't work
+    // 
+    // await controller.evaluateJavascript('fred_add($x, $y)'
+    //     '.then((it) => JSON.stringify({"it" : it}))'
+    //     '.then((result) => Toaster.postMessage(result))');
+    // 
+    // NOTE: however this does work!
+    await controller.evaluateJavascript('Toaster.postMessage(fred_add($x, $y))');
+
+
+    // await controller
+    //     .evaluateJavascript('console.log(fred_alert())'); // alert is suppressed
+
+    // final String contentBase64 =
+    //     base64Encode(const Utf8Encoder().convert(kNavigationExamplePage));
+    // await controller.loadUrl('data:text/html;base64,$contentBase64');
   }
 
   Widget _getCookieList(String cookies) {
