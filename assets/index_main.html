@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>My little js world</title>
+</head>
+
+<body>
+    <p>
+        This is hopefully loaded from assets.  The functions in here are:
+    </p>
+    <ul>
+        <ul>fred() returns 100</ul>
+        <ul>fred_add(a, b)</ul>
+        <ul>fred_add_via_timeout_which_posts(a, b)</ul>
+    </ul>
+    <p>
+        The last function posts to the Toaster channel.
+    </p>
+
+    <script>
+        console.log('hi andy from my little js world.')
+
+        function fred() {
+            return 100
+        }
+
+
+        function fred_add(a, b) {
+            return a + b
+        }
+
+        // totally async
+
+        function fred_add_via_timeout_which_posts(a, b) {
+            setTimeout(_fred_add_which_posts, 3000, a, b);
+        }
+
+        function _fred_add_which_posts(a, b) {
+            let result = a + b
+            Toaster.postMessage(result)  // Toaster is the channel
+        }
+
+        Toaster.postMessage('my little js world loaded and js scripts ran.')
+    </script>
+
+</body>
+
+</html>

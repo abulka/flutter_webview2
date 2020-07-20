@@ -53,6 +53,7 @@ flutter:
     - "assets/index.html"
     - "assets/javascript.js"
     - "assets/indian.html"
+    - "assets/index_main.html"
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
