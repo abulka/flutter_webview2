@@ -1,16 +1,29 @@
 # flutter_webview2
 
-A new Flutter project.
+Playing with webview widget and communicating with javascript - various approaches incl. dynamic asset loading and futures
+
+> Incorporates the older project flutter-webview1 which was supposed to be checked out into the flutter_air_1 directory - now deprecated and deleted.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+Run any one of these files using vscode.
 
-A few resources to get you started if this is your first Flutter project:
+```
+lib/research/
+├── futures
+│   ├── main_futurebuilder.dart
+│   └── main_futurebuilder_not.dart
+├── load_asset
+│   ├── main_load_asset optimised.dart
+│   ├── main_load_asset.dart
+│   └── main_load_asset_failures.dart
+├── webview_interactive
+│   └── main_andy.dart
+├── webview_plugin
+│   └── main_stackoverflow.dart
+└── webview_regular
+    ├── main_load_indian.dart
+    ├── main_official_plus_andy.dart
+    └── main_webview_1.dart
+```
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
