@@ -5,6 +5,9 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 // Uses the regular webview, with an asset being loaded from the filesystem
 
+// HACK 1 and 2 are just two techniques to allow calling a toaster on a scaffold
+// https://stackoverflow.com/questions/51304568/scaffold-of-called-with-a-context-that-does-not-contain-a-scaffold
+
 void main() => runApp(MyApp());
 
 var lastResult = "nothing yet";
@@ -31,12 +34,12 @@ class _WebViewTestState extends State<WebViewTest> {
   //
   WebViewController _webViewController;
   String filePath = 'assets/index_main.html';
-  final globalKey = GlobalKey<ScaffoldState>(); // HACK1
+  final globalKey = GlobalKey<ScaffoldState>(); // HACK1 allocate a new key
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: globalKey, // HACK1
+      key: globalKey, // HACK1 make Scaffold use it, thus giving us access
       appBar: AppBar(title: Text('Webview Little JS World')),
       body: WebView(
         initialUrl: '',
@@ -49,18 +52,29 @@ class _WebViewTestState extends State<WebViewTest> {
           _toasterJavascriptChannel(context),
         ].toSet(),
       ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () {
-          // Scaffold.of(context).showSnackBar(
-          //   SnackBar(content: Text('Calling JS...')),
-          // );
-          globalKey.currentState
-              .showSnackBar(SnackBar(content: Text('Calling JS...')));
+      floatingActionButton: Builder(
+        // HACK2 wrap in a Builder to give 'ctx'
+        builder: (ctx) => FloatingActionButton(
+          child: const Icon(Icons.add),
+          onPressed: () {
+            // Note: context here is wrong, you are using the context of the
+            // widget that instantiated Scaffold.
+            // Not the context of a child of Scaffold.
+            // Scaffold.of(context).showSnackBar(
+            //   SnackBar(content: Text('Calling JS...')),
+            // );
+            // HACK1 use global key to get access to the state object!
+            // globalKey.currentState
+            //     .showSnackBar(SnackBar(content: Text('Calling JS...')));
+            // HACK2 wrap the FloatingActionButton in a a Builder?
+            Scaffold.of(ctx).showSnackBar(
+              SnackBar(content: Text('Calling JS2...')),
+            );
 
-          _webViewController
-              .evaluateJavascript('fred_add_via_timeout_which_posts(10, 10)');
-        },
+            _webViewController
+                .evaluateJavascript('fred_add_via_timeout_which_posts(10, 10)');
+          },
+        ),
       ),
     );
   }
@@ -74,6 +88,7 @@ class _WebViewTestState extends State<WebViewTest> {
           // andy secret way to comm to other code - should perhaps update a provider model?
           lastResult = message.message;
 
+          // HACK1 use global key to get access to the state object!
           globalKey.currentState
               .showSnackBar(SnackBar(content: Text(message.message)));
 
