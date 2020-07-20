@@ -67,12 +67,18 @@ class _WebViewTestState extends State<WebViewTest> {
             //     .showSnackBar(SnackBar(content: Text('Calling JS...')));
             /// HACK2 wrap the FloatingActionButton in a a Builder
             Scaffold.of(ctx).showSnackBar(
-              SnackBar(content: Text('Calling JS2...')),
+              SnackBar(
+                content: Text('Calling JS2...'),
+                behavior: SnackBarBehavior.floating,
+                backgroundColor: Colors.blueGrey[200],
+                duration: Duration(milliseconds: 200),
+              ),
             );
-            print('button ctx: ${ctx.hashCode}');
+            // print('button ctx: ${ctx.hashCode}');
 
             _webViewController
-                .evaluateJavascript('fred_add_via_timeout_which_posts(10, 10)');
+                // .evaluateJavascript('fred_add_via_timeout_which_posts(10, 10)');
+                .evaluateJavascript('add(10, 10)');
           },
         ),
       ),
@@ -90,13 +96,15 @@ class _WebViewTestState extends State<WebViewTest> {
           lastResult = message.message;
 
           // HACK1 use global key to get access to the state object!
-          globalKey.currentState
-              .showSnackBar(SnackBar(content: Text(message.message)));
+          globalKey.currentState.showSnackBar(SnackBar(
+            content: Text(message.message),
+            duration: Duration(seconds: 2),
+          ));
 
           // HACK2 not possible here because we can't wrap anything in a builder,
           // I mean, a JavascriptChannel is not a widget.
           // Though lib\research\webview_official\main_official_big_plus_andy.dart
-          // seems to do it using some future magic - see 
+          // seems to do it using some future magic - see
           // Widget favoriteButton() { ... on line 133.
 
           // Scaffold.of(context).showSnackBar(

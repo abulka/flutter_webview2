@@ -13,9 +13,11 @@
         <ul>fred() returns 100</ul>
         <ul>fred_add(a, b)</ul>
         <ul>fred_add_via_timeout_which_posts(a, b)</ul>
+        <ul>add(a, b)</ul>
     </ul>
     <p>
-        The last function posts to the Toaster channel.
+        The last two functions post to the Toaster channel, 
+        thus we can <b>get the result</b> back to Flutter.
     </p>
 
     <script>
@@ -28,6 +30,13 @@
 
         function fred_add(a, b) {
             return a + b
+        }
+
+        // proper way to do it
+
+        function add(a, b) {
+            let result = a + b
+            Toaster.postMessage(result)
         }
 
         // totally async
