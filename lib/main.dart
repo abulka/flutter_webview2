@@ -31,10 +31,12 @@ class _WebViewTestState extends State<WebViewTest> {
   //
   WebViewController _webViewController;
   String filePath = 'assets/index_main.html';
+  final globalKey = GlobalKey<ScaffoldState>(); // HACK1
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: globalKey, // HACK1
       appBar: AppBar(title: Text('Webview Little JS World')),
       body: WebView(
         initialUrl: '',
@@ -50,10 +52,12 @@ class _WebViewTestState extends State<WebViewTest> {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () {
-          Scaffold.of(context).showSnackBar(
-            SnackBar(content: Text('Calling JS...')),
-          );
-          // _webViewController.evaluateJavascript('fred_add(10, 10)');
+          // Scaffold.of(context).showSnackBar(
+          //   SnackBar(content: Text('Calling JS...')),
+          // );
+          globalKey.currentState
+              .showSnackBar(SnackBar(content: Text('Calling JS...')));
+
           _webViewController
               .evaluateJavascript('fred_add_via_timeout_which_posts(10, 10)');
         },
@@ -66,11 +70,16 @@ class _WebViewTestState extends State<WebViewTest> {
         name: 'Toaster',
         onMessageReceived: (JavascriptMessage message) {
           print('message from javascript: ${message.message}');
-          lastResult = message
-              .message; // andy secret way to comm to other code - should perhaps update a provider model?
-          Scaffold.of(context).showSnackBar(
-            SnackBar(content: Text(message.message)),
-          );
+
+          // andy secret way to comm to other code - should perhaps update a provider model?
+          lastResult = message.message;
+
+          globalKey.currentState
+              .showSnackBar(SnackBar(content: Text(message.message)));
+
+          // Scaffold.of(context).showSnackBar(
+          //   SnackBar(content: Text(message.message)),
+          // );
         });
   }
 
