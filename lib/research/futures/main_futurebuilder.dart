@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
+// Proper use of futurebuilder when building widget which needs extra async info
+// I modified the original example to have a future '_foo' which loads an asset
+
 void main() {
   runApp(new MyApp());
 }

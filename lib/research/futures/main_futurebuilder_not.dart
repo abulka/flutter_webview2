@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 
 // https://stackoverflow.com/questions/49930180/flutter-render-widget-after-async-call/49931743

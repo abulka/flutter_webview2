@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:webview_flutter/webview_flutter.dart';
 
+// Uses the regular webview, with an asset being loaded from the filesystem
 // http://www.coderzheaven.com/2019/05/25/load-local-html-file-into-webview-in-flutter-call-js-function-from-flutter/
 
 void main() => runApp(MyApp());
