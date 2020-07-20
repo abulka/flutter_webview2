@@ -4,8 +4,7 @@ import 'package:flutter/services.dart' show rootBundle;
 
 // Uses the extra webview functionality of 'flutter_webview_plugin'
 // with additional asset loading
-// Works - but has flash of ugly text - presumably we could fix this
-// by returning a Scaffold instead of a pure text widget when waiting.
+// Works.
 
 final Set<JavascriptChannel> jsChannels = [
   JavascriptChannel(
@@ -41,16 +40,18 @@ class _MyAppState extends State<MyApp> {
             if (snapshot.hasData) {
               // return Text('The answer to everything is ${snapshot.data}');
               return WebviewScaffold(
-                url: Uri.dataFromString(
-                        snapshot.data,
-                        mimeType: 'text/html')
+                url: Uri.dataFromString(snapshot.data, mimeType: 'text/html')
                     .toString(),
                 withLocalUrl: true,
-                appBar: new AppBar(title: new Text("flutter_webview_plugin - FutureBuilder")),
+                appBar: new AppBar(
+                    title: new Text("flutter_webview_plugin - FutureBuilder")),
                 javascriptChannels: jsChannels,
               );
             } else {
-              return Text('Loading...');
+              return Scaffold(
+                appBar: AppBar(title: Text('flutter_webview_plugin - FutureBuilder WAITING')),
+                body: Text('Loading...'),
+              );
             }
           })
     });
@@ -58,6 +59,6 @@ class _MyAppState extends State<MyApp> {
 }
 
 Future<String> loadAsset() async {
-  // await Future.delayed(Duration(seconds: 2)); // wait
+  await Future.delayed(Duration(seconds: 2)); // wait
   return await rootBundle.loadString('assets/index.html');
 }
