@@ -57,19 +57,19 @@ class _WebViewTestState extends State<WebViewTest> {
         builder: (ctx) => FloatingActionButton(
           child: const Icon(Icons.add),
           onPressed: () {
-            // Note: context here is wrong, you are using the context of the
-            // widget that instantiated Scaffold.
-            // Not the context of a child of Scaffold.
+            /// Note: context here is wrong, you are using the context of the
+            /// widget that instantiated Scaffold, not the context of a child of Scaffold.
             // Scaffold.of(context).showSnackBar(
             //   SnackBar(content: Text('Calling JS...')),
             // );
-            // HACK1 use global key to get access to the state object!
+            /// HACK1 use global key to get access to the state object!
             // globalKey.currentState
             //     .showSnackBar(SnackBar(content: Text('Calling JS...')));
-            // HACK2 wrap the FloatingActionButton in a a Builder?
+            /// HACK2 wrap the FloatingActionButton in a a Builder
             Scaffold.of(ctx).showSnackBar(
               SnackBar(content: Text('Calling JS2...')),
             );
+            print('button ctx: ${ctx.hashCode}');
 
             _webViewController
                 .evaluateJavascript('fred_add_via_timeout_which_posts(10, 10)');
@@ -83,7 +83,8 @@ class _WebViewTestState extends State<WebViewTest> {
     return JavascriptChannel(
         name: 'Toaster',
         onMessageReceived: (JavascriptMessage message) {
-          print('message from javascript: ${message.message}');
+          print(
+              'message from javascript: ${message.message} context: ${context.hashCode}');
 
           // andy secret way to comm to other code - should perhaps update a provider model?
           lastResult = message.message;
@@ -91,6 +92,12 @@ class _WebViewTestState extends State<WebViewTest> {
           // HACK1 use global key to get access to the state object!
           globalKey.currentState
               .showSnackBar(SnackBar(content: Text(message.message)));
+
+          // HACK2 not possible here because we can't wrap anything in a builder,
+          // I mean, a JavascriptChannel is not a widget.
+          // Though lib\research\webview_official\main_official_big_plus_andy.dart
+          // seems to do it using some future magic - see 
+          // Widget favoriteButton() { ... on line 133.
 
           // Scaffold.of(context).showSnackBar(
           //   SnackBar(content: Text(message.message)),
