@@ -1,7 +1,21 @@
 import 'package:flutter/material.dart';
 
 // global key technique works for accessing a scaffold
-// but not when accessing other custom widgets - why?
+
+// Note we pass in the global key in the constructor of the Scaffold
+//    Scaffold(key: globalKey... 
+// is what we do here, which lets us get
+// access to the ScaffoldState instance
+// 
+// When we have a custom widget, we must declare the stateful widget
+// with the Another({Key key}) : super(key: key) constructor
+// and just as with Scaffold, pass in the globalkey in the constructor
+//    Another(key: globalKey)
+// where globalKey is of type _AnotherState viz
+//    final another = GlobalKey<_AnotherState>();
+// MY mistake at some stage was to use the key in the constructor of
+// Padding *inside* the _AnotherState build() method - WTF 😆
+
 
 void main() => runApp(MyApp());
 
