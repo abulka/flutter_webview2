@@ -41,16 +41,21 @@ class _WebViewTestState extends State<WebViewTest> {
     return Scaffold(
       key: globalKey, // HACK1 make Scaffold use it, thus giving us access
       appBar: AppBar(title: Text('Webview Little JS World')),
-      body: WebView(
-        initialUrl: '',
-        javascriptMode: JavascriptMode.unrestricted,
-        onWebViewCreated: (WebViewController webViewController) {
-          _webViewController = webViewController;
-          _loadHtmlFromAssets();
-        },
-        javascriptChannels: <JavascriptChannel>[
-          _toasterJavascriptChannel(context),
-        ].toSet(),
+      body: Builder(
+        // HACK2 wrap webview in a Builder to give 'ctx' to pass to 
+        // _toasterJavascriptChannel which needs access to Scaffold context
+        builder: (ctx) => WebView(
+          initialUrl: '',
+          javascriptMode: JavascriptMode.unrestricted,
+          onWebViewCreated: (WebViewController webViewController) {
+            _webViewController = webViewController;
+            _loadHtmlFromAssets();
+          },
+          javascriptChannels: <JavascriptChannel>[
+            // _toasterJavascriptChannel(context),
+            _toasterJavascriptChannel(ctx),
+          ].toSet(),
+        ),
       ),
       floatingActionButton: Builder(
         // HACK2 wrap in a Builder to give 'ctx'
@@ -62,10 +67,11 @@ class _WebViewTestState extends State<WebViewTest> {
             // Scaffold.of(context).showSnackBar(
             //   SnackBar(content: Text('Calling JS...')),
             // );
-            /// HACK1 use global key to get access to the state object!
+            /// HACK1 use global key to get access to the state object! Works👍
             // globalKey.currentState
             //     .showSnackBar(SnackBar(content: Text('Calling JS...')));
-            /// HACK2 wrap the FloatingActionButton in a a Builder
+
+            /// HACK2 wrap the FloatingActionButton in a Builder. Works 
             Scaffold.of(ctx).showSnackBar(
               SnackBar(
                 content: Text('Calling JS2...'),
@@ -74,7 +80,7 @@ class _WebViewTestState extends State<WebViewTest> {
                 duration: Duration(milliseconds: 200),
               ),
             );
-            // print('button ctx: ${ctx.hashCode}');
+            print('button ctx: ${ctx.hashCode}');
 
             _webViewController
                 // .evaluateJavascript('fred_add_via_timeout_which_posts(10, 10)');
@@ -95,21 +101,24 @@ class _WebViewTestState extends State<WebViewTest> {
           // andy secret way to comm to other code - should perhaps update a provider model?
           lastResult = message.message;
 
-          // HACK1 use global key to get access to the state object!
-          globalKey.currentState.showSnackBar(SnackBar(
-            content: Text(message.message),
-            duration: Duration(seconds: 2),
-          ));
+          // HACK1 use global key to get access to the state object! Works!
+          // globalKey.currentState.showSnackBar(SnackBar(
+          //   content: Text(message.message),
+          //   duration: Duration(seconds: 2),
+          // ));
 
-          // HACK2 not possible here because we can't wrap anything in a builder,
-          // I mean, a JavascriptChannel is not a widget.
-          // Though lib\research\webview_official\main_official_big_plus_andy.dart
+          // HACK2 also possible here because _toasterJavascriptChannel is
+          // called when building the webview and context passed into here.
+          // So we wrap webview in a Builder to give 'ctx' which gets here
+          Scaffold.of(context).showSnackBar(
+            SnackBar(content: Text(message.message)),
+          );
+
+          // HACK3 - untried
+          // The lib\research\webview_official\main_official_big_plus_andy.dart
           // seems to do it using some future magic - see
           // Widget favoriteButton() { ... on line 133.
 
-          // Scaffold.of(context).showSnackBar(
-          //   SnackBar(content: Text(message.message)),
-          // );
         });
   }
 
