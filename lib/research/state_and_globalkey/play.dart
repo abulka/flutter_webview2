@@ -20,8 +20,11 @@ class MyApp extends StatelessWidget {
             ),
             AndyStateless(),
             AndyStateful(),
-            // Another(), // this never got access to the global 'another' key
-            Another(key: another),
+
+            // Either of these two constructors work
+            Another(),
+            // Another.withKey(key: another),
+
             AnotherButton(),
           ],
         ),
@@ -90,7 +93,11 @@ final another = GlobalKey<_AnotherState>();
 var another2;
 
 class Another extends StatefulWidget {
-  Another({Key key}) : super(key: key); // setting up to use pre-allocated key
+  Another() : super(key: another); // setting up to use pre-allocated key
+
+  // Or could use this constructor and pass in the key from above - fiddly
+  Another.withKey({Key key})
+      : super(key: key); // setting up to use pre-allocated key
 
   @override
   _AnotherState createState() {
@@ -101,7 +108,8 @@ class Another extends StatefulWidget {
 
 class _AnotherState extends State<Another> {
   var _msg = 'quantum';
-  final another3 = GlobalKey<_AnotherState>(); // perhaps if key is inside class - NO DIFF
+  final another3 =
+      GlobalKey<_AnotherState>(); // perhaps if key is inside class - NO DIFF
 
   set msg(value) {
     setState(() {
@@ -131,9 +139,11 @@ class _AnotherState extends State<Another> {
             RaisedButton(
               child: Text('am inside widget'),
               onPressed: () {
-                print('$another ${another.currentState} $another2  $another3 ${another3.currentState}');
+                print(
+                    '$another ${another.currentState} $another2  $another3 ${another3.currentState}');
                 // another3.currentState.msg = 'physics inside';  // official globalkey way does not, currentState is null
-                another.currentState.msg = 'physics inside';  // official globalkey way OK
+                another.currentState.msg =
+                    'physics inside'; // official globalkey way OK
               },
             )
           ],
@@ -143,7 +153,7 @@ class _AnotherState extends State<Another> {
   }
 }
 
-// External Widget which accesses 'another' via key - naughty but nice - doesn't work
+// External Widget which accesses 'another' via key - naughty but nice
 
 class AnotherButton extends StatelessWidget {
   @override
@@ -153,8 +163,9 @@ class AnotherButton extends StatelessWidget {
         child: Text('am outside widget'),
         onPressed: () {
           print('$another ${another.currentState} $another2');
-          // another2.msg = 'physics'; // my super hack works
-          another.currentState.msg = 'physics';  // official globalkey way works too! 🔆🔆
+          another.currentState.msg =
+              'physics'; // official globalkey way works! 🔆🔆
+          // another2.msg = 'physics'; // my super hack works too
         },
       ),
     );
