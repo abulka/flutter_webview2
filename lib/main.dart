@@ -52,11 +52,28 @@ class _WebViewTestState extends State<WebViewTest> {
                   print("text field so far...: $text");
                 },
                 onSubmitted: (value) {
-                  var s = 'result = $value; Toaster.postMessage(result.toString())';
+                  var s =
+                      'result = $value; Toaster.postMessage(result.toString())';
                   print(s);
                   _webViewController.evaluateJavascript(s);
                 },
               ),
+            ),
+            Row(
+              children: [
+                RaisedButton(
+                  onPressed: () => print("math.evaluate('12.7 cm to inch')"),
+                  child: Text('example to inch'),
+                ),
+                RaisedButton(
+                  onPressed: () => print("math.evaluate('sin(45 deg) ^ 2')"),
+                  child: Text('example sin'),
+                ),
+                RaisedButton(
+                  onPressed: () => print("math.pow([[-1, 2], [3, 1]], 2)"),
+                  child: Text('example math.pow'),
+                )
+              ],
             ),
             Container(
               height: 250,
