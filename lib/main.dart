@@ -5,7 +5,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 // Uses the regular webview, with an asset being loaded from the filesystem
 
-// Both webview and FloatingActionButton wrapped in a Builder to give 'ctx' to pass to 
+// Both webview and FloatingActionButton wrapped in a Builder to give 'ctx' to pass to
 // _toasterJavascriptChannel or onPressed - which needs access to Scaffold context for toaster
 // (research in research/webview_official/toaster_scaffold_context_tricks/main_toaster_hacks.dart)
 
@@ -41,16 +41,38 @@ class _WebViewTestState extends State<WebViewTest> {
     return Scaffold(
       appBar: AppBar(title: Text('Webview Little JS World')),
       body: Builder(
-        builder: (ctx) => WebView(
-          initialUrl: '',
-          javascriptMode: JavascriptMode.unrestricted,
-          onWebViewCreated: (WebViewController webViewController) {
-            _webViewController = webViewController;
-            _loadHtmlFromAssets();
-          },
-          javascriptChannels: <JavascriptChannel>[
-            _toasterJavascriptChannel(ctx),
-          ].toSet(),
+        builder: (ctx) => Column(
+          children: [
+            Container(
+              color: Colors.amber,
+              child: TextField(
+                decoration: InputDecoration(
+                    border: InputBorder.none, hintText: 'Enter a math term'),
+                onChanged: (text) {
+                  print("text field so far...: $text");
+                },
+                onSubmitted: (value) {
+                  var s = 'result = $value; Toaster.postMessage(result.toString())';
+                  print(s);
+                  _webViewController.evaluateJavascript(s);
+                },
+              ),
+            ),
+            Container(
+              height: 250,
+              child: WebView(
+                initialUrl: '',
+                javascriptMode: JavascriptMode.unrestricted,
+                onWebViewCreated: (WebViewController webViewController) {
+                  _webViewController = webViewController;
+                  _loadHtmlFromAssets();
+                },
+                javascriptChannels: <JavascriptChannel>[
+                  _toasterJavascriptChannel(ctx),
+                ].toSet(),
+              ),
+            ),
+          ],
         ),
       ),
       floatingActionButton: Builder(
@@ -69,7 +91,8 @@ class _WebViewTestState extends State<WebViewTest> {
                 // .evaluateJavascript('fred_add_via_timeout_which_posts(10, 10)');
                 // .evaluateJavascript('add(10, 10)');
                 // .evaluateJavascript('mathjs1(10, 10)');
-                .evaluateJavascript('result = math.sqrt(-2).toString(); Toaster.postMessage(result)');
+                .evaluateJavascript(
+                    'result = math.sqrt(-2).toString(); Toaster.postMessage(result)');
           },
         ),
       ),
