@@ -68,7 +68,8 @@ class _WebViewTestState extends State<WebViewTest> {
             _webViewController
                 // .evaluateJavascript('fred_add_via_timeout_which_posts(10, 10)');
                 // .evaluateJavascript('add(10, 10)');
-                .evaluateJavascript('mathjs1(10, 10)');
+                // .evaluateJavascript('mathjs1(10, 10)');
+                .evaluateJavascript('result = math.sqrt(-2).toString(); Toaster.postMessage(result)');
           },
         ),
       ),
