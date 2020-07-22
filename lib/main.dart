@@ -67,28 +67,42 @@ class _WebViewTestState extends State<WebViewTest> {
                   print("text field so far...: $text");
                 },
                 onSubmitted: (value) {
-                  var s =
-                      'result = $value; Toaster.postMessage(result.toString())';
-                  print(s);
-                  _webViewController.evaluateJavascript(s);
+                  assert(value == txtController.text);
+                  doEval();
                 },
               ),
             ),
             Row(
               children: [
                 RaisedButton(
-                  onPressed: () => txtController.text = "math.evaluate('12.7 cm to inch')",
+                  onPressed: () {
+                    txtController.text = "math.evaluate('12.7 cm to inch')";
+                    txtController.selection = TextSelection.fromPosition(
+                      TextPosition(offset: txtController.text.length),
+                    );
+                  },
                   child: Text('example to inch'),
                 ),
                 RaisedButton(
-                  onPressed: () => txtController.text = "math.evaluate('sin(45 deg) ^ 2')",
+                  onPressed: () =>
+                      txtController.text = "math.evaluate('sin(45 deg) ^ 2')",
                   child: Text('example sin'),
                 ),
                 RaisedButton(
-                  onPressed: () => txtController.text = "math.pow([[-1, 2], [3, 1]], 2)",
+                  onPressed: () =>
+                      txtController.text = "math.pow([[-1, 2], [3, 1]], 2)",
                   child: Text('example math.pow'),
                 )
               ],
+            ),
+            Center(
+              child: RaisedButton(
+                color: Colors.green,
+                onPressed: () {
+                  doEval();
+                },
+                child: Text('='),
+              ),
             ),
             Container(
               height: 250,
@@ -129,6 +143,14 @@ class _WebViewTestState extends State<WebViewTest> {
         ),
       ),
     );
+  }
+
+  void doEval() {
+    var expr = txtController.text;
+    var s =
+        'result = $expr; Toaster.postMessage(result.toString())';
+    print(s);
+    _webViewController.evaluateJavascript(s);
   }
 
   JavascriptChannel _toasterJavascriptChannel(BuildContext context) {
