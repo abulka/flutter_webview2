@@ -3,6 +3,9 @@
 
 <head>
     <title>My little js world</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/7.1.0/math.min.js" type="text/javascript"></script>
+    
 </head>
 
 <body>
@@ -12,6 +15,7 @@
     <ul>
         <ul>fred() returns 100</ul>
         <ul>fred_add(a, b)</ul>
+        <ul>--</ul>
         <ul>fred_add_via_timeout_which_posts(a, b)</ul>
         <ul>add(a, b)</ul>
     </ul>
@@ -49,6 +53,14 @@
             let result = a + b
             Toaster.postMessage(result)  // Toaster is the channel
         }
+
+        // mathjs
+
+        function mathjs1(a, b) {
+            let result = math.sqrt(-4).toString()
+            Toaster.postMessage(result)
+        }
+
 
         Toaster.postMessage('my little js world loaded and js scripts ran.')
     </script>
