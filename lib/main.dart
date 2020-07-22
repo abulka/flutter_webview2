@@ -35,6 +35,20 @@ class _WebViewTestState extends State<WebViewTest> {
   //
   WebViewController _webViewController;
   String filePath = 'assets/index_main.html';
+  TextEditingController txtController;
+  // String _input = '';
+
+  // set input(String val) {
+  //   setState(() {
+  //     _input = val;
+  //   });
+  // }
+
+  @override
+  void initState() {
+    super.initState();
+    txtController = TextEditingController(text: "2 + 3");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +60,7 @@ class _WebViewTestState extends State<WebViewTest> {
             Container(
               color: Colors.amber,
               child: TextField(
+                controller: txtController,
                 decoration: InputDecoration(
                     border: InputBorder.none, hintText: 'Enter a math term'),
                 onChanged: (text) {
@@ -62,15 +77,15 @@ class _WebViewTestState extends State<WebViewTest> {
             Row(
               children: [
                 RaisedButton(
-                  onPressed: () => print("math.evaluate('12.7 cm to inch')"),
+                  onPressed: () => txtController.text = "math.evaluate('12.7 cm to inch')",
                   child: Text('example to inch'),
                 ),
                 RaisedButton(
-                  onPressed: () => print("math.evaluate('sin(45 deg) ^ 2')"),
+                  onPressed: () => txtController.text = "math.evaluate('sin(45 deg) ^ 2')",
                   child: Text('example sin'),
                 ),
                 RaisedButton(
-                  onPressed: () => print("math.pow([[-1, 2], [3, 1]], 2)"),
+                  onPressed: () => txtController.text = "math.pow([[-1, 2], [3, 1]], 2)",
                   child: Text('example math.pow'),
                 )
               ],
