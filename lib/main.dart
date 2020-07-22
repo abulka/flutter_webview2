@@ -5,8 +5,9 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 // Uses the regular webview, with an asset being loaded from the filesystem
 
-// HACK 1 and 2 are just two techniques to allow calling a toaster on a scaffold
-// https://stackoverflow.com/questions/51304568/scaffold-of-called-with-a-context-that-does-not-contain-a-scaffold
+// Both webview and FloatingActionButton wrapped in a Builder to give 'ctx' to pass to 
+// _toasterJavascriptChannel or onPressed - which needs access to Scaffold context for toaster
+// (research in research/webview_official/toaster_scaffold_context_tricks/main_toaster_hacks.dart)
 
 void main() => runApp(MyApp());
 
@@ -34,16 +35,12 @@ class _WebViewTestState extends State<WebViewTest> {
   //
   WebViewController _webViewController;
   String filePath = 'assets/index_main.html';
-  final globalKey = GlobalKey<ScaffoldState>(); // HACK1 allocate a new key
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: globalKey, // HACK1 make Scaffold use it, thus giving us access
       appBar: AppBar(title: Text('Webview Little JS World')),
       body: Builder(
-        // HACK2 wrap webview in a Builder to give 'ctx' to pass to 
-        // _toasterJavascriptChannel which needs access to Scaffold context
         builder: (ctx) => WebView(
           initialUrl: '',
           javascriptMode: JavascriptMode.unrestricted,
@@ -52,26 +49,14 @@ class _WebViewTestState extends State<WebViewTest> {
             _loadHtmlFromAssets();
           },
           javascriptChannels: <JavascriptChannel>[
-            // _toasterJavascriptChannel(context),
             _toasterJavascriptChannel(ctx),
           ].toSet(),
         ),
       ),
       floatingActionButton: Builder(
-        // HACK2 wrap in a Builder to give 'ctx'
         builder: (ctx) => FloatingActionButton(
           child: const Icon(Icons.add),
           onPressed: () {
-            /// Note: context here is wrong, you are using the context of the
-            /// widget that instantiated Scaffold, not the context of a child of Scaffold.
-            // Scaffold.of(context).showSnackBar(
-            //   SnackBar(content: Text('Calling JS...')),
-            // );
-            /// HACK1 use global key to get access to the state object! Works👍
-            // globalKey.currentState
-            //     .showSnackBar(SnackBar(content: Text('Calling JS...')));
-
-            /// HACK2 wrap the FloatingActionButton in a Builder. Works 
             Scaffold.of(ctx).showSnackBar(
               SnackBar(
                 content: Text('Calling JS2...'),
@@ -80,8 +65,6 @@ class _WebViewTestState extends State<WebViewTest> {
                 duration: Duration(milliseconds: 200),
               ),
             );
-            print('button ctx: ${ctx.hashCode}');
-
             _webViewController
                 // .evaluateJavascript('fred_add_via_timeout_which_posts(10, 10)');
                 .evaluateJavascript('add(10, 10)');
@@ -97,28 +80,11 @@ class _WebViewTestState extends State<WebViewTest> {
         onMessageReceived: (JavascriptMessage message) {
           print(
               'message from javascript: ${message.message} context: ${context.hashCode}');
-
           // andy secret way to comm to other code - should perhaps update a provider model?
           lastResult = message.message;
-
-          // HACK1 use global key to get access to the state object! Works!
-          // globalKey.currentState.showSnackBar(SnackBar(
-          //   content: Text(message.message),
-          //   duration: Duration(seconds: 2),
-          // ));
-
-          // HACK2 also possible here because _toasterJavascriptChannel is
-          // called when building the webview and context passed into here.
-          // So we wrap webview in a Builder to give 'ctx' which gets here
           Scaffold.of(context).showSnackBar(
             SnackBar(content: Text(message.message)),
           );
-
-          // HACK3 - untried
-          // The lib\research\webview_official\main_official_big_plus_andy.dart
-          // seems to do it using some future magic - see
-          // Widget favoriteButton() { ... on line 133.
-
         });
   }
 
