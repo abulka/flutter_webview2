@@ -121,31 +121,11 @@ class CalculationList extends StatelessWidget {
 
   CalculationList({@required this.calculations});
 
-  // After 1 second, it takes you to the bottom of the ListView
-  // Timer(
-  //   Duration(seconds: 1),
-  //   () => _controller.jumpTo(_controller.position.maxScrollExtent),
-  // );
-
-  // Timer(Duration(seconds: 3), () {});
-
-  final timeout = const Duration(seconds: 1);
-  final ms = const Duration(milliseconds: 1);
-  startTimeout([int milliseconds]) {
-    var duration = milliseconds == null ? timeout : ms * milliseconds;
-    return Timer(duration, handleTimeout);
-  }
-
-  void handleTimeout() {
-    // callback function
-    print(
-        'timeout callback, _controller.position.maxScrollExtent=${_controller.position.maxScrollExtent}');
-    _controller.jumpTo(_controller.position.maxScrollExtent);
-  }
-
   @override
   Widget build(BuildContext context) {
-    startTimeout();
+    // timer should only happen if hit add 
+    Timer(Duration(milliseconds: 100),
+        () => _controller.jumpTo(_controller.position.maxScrollExtent));
     return ListView(
       controller: _controller,
       children: convertModelToWidgets(),
