@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
@@ -58,115 +60,129 @@ class _WebViewTestState extends State<WebViewTest> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false, // avoid resize when keyboard appears
-      appBar: AppBar(title: Text('Webview Little JS World')),
-      body: Column(
-        children: [
-          Container(
-            height: 15,
-            color: Colors.amber[500],
-            child: const Center(
-                child: Text('status indicators etc',
-                    style: TextStyle(
-                        fontSize: 10.0, fontWeight: FontWeight.bold))),
-          ),
-          Expanded(child: _myListView2(context)),
-          Container(
-            color: Colors.amber,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: txtController,
-                decoration: InputDecoration(
-                    fillColor: Colors.white,
-                    filled: true,
-                    contentPadding:
-                        const EdgeInsets.only(left: 4.0, bottom: 2.0, top: 2.0),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(1))),
-                    hintText: 'Enter a math term'),
-                onChanged: (text) {
-                  print("text field so far...: $text");
-                },
-                onSubmitted: (value) {
-                  assert(value == txtController.text);
-                  doEval();
-                },
-              ),
-            ),
-          ),
-          Row(
-            children: [
-              RaisedButton(
-                onPressed: () {
-                  txtController.text = "math.evaluate('12.7 cm to inch')";
-                  txtController.selection = TextSelection.fromPosition(
-                    TextPosition(offset: txtController.text.length),
-                  );
-                },
-                child: Text('example to inch'),
-              ),
-              RaisedButton(
-                onPressed: () =>
-                    txtController.text = "math.evaluate('sin(45 deg) ^ 2')",
-                child: Text('example sin'),
-              ),
-              RaisedButton(
-                onPressed: () =>
-                    txtController.text = "math.pow([[-1, 2], [3, 1]], 2)",
-                child: Text('example math.pow'),
-              )
-            ],
-          ),
-          Center(
-            child: RaisedButton(
-              color: Colors.green,
-              onPressed: () {
-                doEval();
-              },
-              child: Text('='),
-            ),
-          ),
-          Container(
-            height: 250,
-            child: WebView(
-              initialUrl: '',
-              javascriptMode: JavascriptMode.unrestricted,
-              onWebViewCreated: (WebViewController webViewController) {
-                _webViewController = webViewController;
-                _loadHtmlFromAssets();
-              },
-              javascriptChannels: <JavascriptChannel>[
-                _toasterJavascriptChannel(context),
-              ].toSet(),
-            ),
-          ),
-        ],
-      ),
+    return Builder(
+        builder: (ctx) => Scaffold(
+              resizeToAvoidBottomInset:
+                  false, // avoid resize when keyboard appears
+              appBar: AppBar(title: Text('Webview Little JS World')),
+              body: Column(
+                children: [
+                  Container(
+                    height: 15,
+                    color: Colors.amber[500],
+                    child: const Center(
+                        child: Text('status indicators etc',
+                            style: TextStyle(
+                                fontSize: 10.0, fontWeight: FontWeight.bold))),
+                  ),
+                  Expanded(child: _myListView2(context)),
+                  Container(
+                    color: Colors.amber,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        controller: txtController,
+                        decoration: InputDecoration(
+                            fillColor: Colors.white,
+                            filled: true,
+                            contentPadding: const EdgeInsets.only(
+                                left: 4.0, bottom: 2.0, top: 2.0),
+                            border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(1))),
+                            hintText: 'Enter a math term'),
+                        onChanged: (text) {
+                          print("text field so far...: $text");
+                        },
+                        onSubmitted: (value) {
+                          assert(value == txtController.text);
+                          doEval();
+                        },
+                      ),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      RaisedButton(
+                        onPressed: () {
+                          txtController.text =
+                              "math.evaluate('12.7 cm to inch')";
+                          txtController.selection = TextSelection.fromPosition(
+                            TextPosition(offset: txtController.text.length),
+                          );
+                        },
+                        child: Text('example to inch'),
+                      ),
+                      RaisedButton(
+                        onPressed: () => txtController.text =
+                            "math.evaluate('sin(45 deg) ^ 2')",
+                        child: Text('example sin'),
+                      ),
+                      RaisedButton(
+                        onPressed: () => txtController.text =
+                            "math.pow([[-1, 2], [3, 1]], 2)",
+                        child: Text('example math.pow'),
+                      )
+                    ],
+                  ),
+                  Center(
+                    child: RaisedButton(
+                      color: Colors.green,
+                      onPressed: () {
+                        doEval();
 
-      floatingActionButton: Builder(
-        builder: (ctx) => FloatingActionButton(
-          child: const Icon(Icons.add),
-          onPressed: () {
-            Scaffold.of(ctx).showSnackBar(
-              SnackBar(
-                content: Text('Calling JS2...'),
-                behavior: SnackBarBehavior.floating,
-                backgroundColor: Colors.blueGrey[200],
-                duration: Duration(milliseconds: 200),
+                        // Dummy
+                        // var r = Random();
+                        // var expression = '${r.nextInt(1000)} + ${r.nextInt(1000)}';
+                        // if (r.nextInt(100) < 50) expression += ' / ${r.nextInt(1000)}';
+                        // final Calculation c = Calculation(
+                        //   expression: expression,
+                        //   completed: false,
+                        // );
+                        // Provider.of<CalculationsModel>(context, listen: false).add(c);
+                      },
+                      child: Text('='),
+                    ),
+                  ),
+                  Container(
+                    height: 250,
+                    child: WebView(
+                      initialUrl: '',
+                      javascriptMode: JavascriptMode.unrestricted,
+                      onWebViewCreated: (WebViewController webViewController) {
+                        _webViewController = webViewController;
+                        _loadHtmlFromAssets();
+                      },
+                      javascriptChannels: <JavascriptChannel>[
+                        _toasterJavascriptChannel(context),
+                      ].toSet(),
+                    ),
+                  ),
+                ],
               ),
-            );
-            _webViewController
-                // .evaluateJavascript('fred_add_via_timeout_which_posts(10, 10)');
-                // .evaluateJavascript('add(10, 10)');
-                // .evaluateJavascript('mathjs1(10, 10)');
-                .evaluateJavascript(
-                    'result = math.sqrt(-2).toString(); Toaster.postMessage(result)');
-          },
-        ),
-      ),
-    );
+
+              floatingActionButton: Builder(
+                builder: (ctx) => FloatingActionButton(
+                  child: const Icon(Icons.add),
+                  onPressed: () {
+                    Scaffold.of(ctx).showSnackBar(
+                      SnackBar(
+                        content: Text('Calling JS2...'),
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: Colors.blueGrey[200],
+                        duration: Duration(milliseconds: 200),
+                      ),
+                    );
+                    _webViewController
+                        // .evaluateJavascript('fred_add_via_timeout_which_posts(10, 10)');
+                        // .evaluateJavascript('add(10, 10)');
+                        // .evaluateJavascript('mathjs1(10, 10)');
+                        .evaluateJavascript(
+                            'result = math.sqrt(-2).toString(); Toaster.postMessage(result)');
+                  },
+                ),
+              ),
+            ));
   }
 
   void doEval() {
@@ -184,9 +200,23 @@ class _WebViewTestState extends State<WebViewTest> {
               'message from javascript: ${message.message} context: ${context.hashCode}');
           // andy secret way to comm to other code - should perhaps update a provider model?
           lastResult = message.message;
-          Scaffold.of(context).showSnackBar(
-            SnackBar(content: Text(message.message)),
+
+          // Snackbar is broken again ***
+          // Scaffold.of(context).showSnackBar(
+          //   SnackBar(content: Text(message.message)),
+          // );
+
+          // a real calculation
+          var r = Random();
+          var expression = '${r.nextInt(1000)} + ${r.nextInt(1000)}';
+          if (r.nextInt(100) < 50) expression += ' / ${r.nextInt(1000)}';
+          expression += ' = ${message.message}';
+          final Calculation c = Calculation(
+            expression: expression,
+            completed: false,
           );
+
+          Provider.of<CalculationsModel>(context, listen: false).add(c);
         });
   }
 
