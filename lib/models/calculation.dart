@@ -28,7 +28,7 @@ class CalculationsModel extends ChangeNotifier {
   get incompleteCalculations => _calculations.where((c) => !c.completed);
   get completedCalculations => _calculations.where((c) => c.completed);
 
-  void addTodo(Calculation c) {
+  void add(Calculation c) {
     _calculations.add(c);
     notifyListeners();
   }

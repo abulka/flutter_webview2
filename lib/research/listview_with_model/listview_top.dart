@@ -41,37 +41,50 @@ class MyApp extends StatelessWidget {
 class BodyLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          height: 15,
-          color: Colors.amber[500],
-          child: const Center(
-              child: Text('status indicators etc',
-                  style:
-                      TextStyle(fontSize: 10.0, fontWeight: FontWeight.bold))),
-        ),
-        // Expanded(child: _myListView(context)),
-        Expanded(child: _myListView2(context)),
-        Container(
-          height: 50,
-          color: Colors.amber[200],
-          child: Row(
-            children: <Widget>[
-              RaisedButton(
-                child: Text('Add'),
-                onPressed: () {
-                  print('xx');
-                },
-              )
-            ],
-          ),
-        ),
-        Container(
-          height: 200,
-          color: Colors.amber,
-        ),
-      ],
+    return ChangeNotifierProvider(
+      create: (context) => CalculationsModel(),
+      builder: (context, child) {
+        // return Text('xxx');
+        return Column(
+          children: [
+            Container(
+              height: 15,
+              color: Colors.amber[500],
+              child: const Center(
+                  child: Text('status indicators etc',
+                      style: TextStyle(
+                          fontSize: 10.0, fontWeight: FontWeight.bold))),
+            ),
+            // Expanded(child: _myListView(context)),
+            Expanded(child: _myListView2(context)),
+            Container(
+              height: 50,
+              color: Colors.amber[200],
+              child: Row(
+                children: <Widget>[
+                  RaisedButton(
+                    child: Text('Add'),
+                    onPressed: () {
+                      print('xx');
+                      var r = Random();
+                      final Calculation c = Calculation(
+                        expression: '${r.nextInt(1000)} + ${r.nextInt(1000)}',
+                        completed: false,
+                      );
+                      Provider.of<CalculationsModel>(context, listen: false)
+                          .add(c);
+                    },
+                  )
+                ],
+              ),
+            ),
+            Container(
+              height: 200,
+              color: Colors.amber,
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -92,13 +105,10 @@ Widget _myListView2(BuildContext context) {
 class AllCalculations extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => CalculationsModel(),
-      child: Container(
-        child: Consumer<CalculationsModel>(
-          builder: (context, calculations, child) => CalculationList(
-            calculations: calculations.allCalculations,
-          ),
+    return Container(
+      child: Consumer<CalculationsModel>(
+        builder: (context, calculations, child) => CalculationList(
+          calculations: calculations.allCalculations,
         ),
       ),
     );
