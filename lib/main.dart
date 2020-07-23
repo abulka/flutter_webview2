@@ -53,6 +53,7 @@ class _WebViewTestState extends State<WebViewTest> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false, // avoid resize when keyboard appears
       appBar: AppBar(title: Text('Webview Little JS World')),
       body: Builder(
         builder: (ctx) => Column(
@@ -147,8 +148,7 @@ class _WebViewTestState extends State<WebViewTest> {
 
   void doEval() {
     var expr = txtController.text;
-    var s =
-        'result = $expr; Toaster.postMessage(result.toString())';
+    var s = 'result = $expr; Toaster.postMessage(result.toString())';
     print(s);
     _webViewController.evaluateJavascript(s);
   }
