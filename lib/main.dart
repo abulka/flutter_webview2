@@ -60,17 +60,26 @@ class _WebViewTestState extends State<WebViewTest> {
           children: [
             Container(
               color: Colors.amber,
-              child: TextField(
-                controller: txtController,
-                decoration: InputDecoration(
-                    border: InputBorder.none, hintText: 'Enter a math term'),
-                onChanged: (text) {
-                  print("text field so far...: $text");
-                },
-                onSubmitted: (value) {
-                  assert(value == txtController.text);
-                  doEval();
-                },
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: txtController,
+                  decoration: InputDecoration(
+                      fillColor: Colors.white,
+                      filled: true,
+                      contentPadding: const EdgeInsets.only(
+                          left: 4.0, bottom: 2.0, top: 2.0),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(1))),
+                      hintText: 'Enter a math term'),
+                  onChanged: (text) {
+                    print("text field so far...: $text");
+                  },
+                  onSubmitted: (value) {
+                    assert(value == txtController.text);
+                    doEval();
+                  },
+                ),
               ),
             ),
             Row(
