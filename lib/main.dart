@@ -199,9 +199,9 @@ class _WebViewTestState extends State<WebViewTest> {
           // andy secret way to comm to other code - should perhaps update a provider model?
           lastResult = message.message;
 
-          Scaffold.of(context).showSnackBar(
-            SnackBar(content: Text(message.message)),
-          );
+          // Scaffold.of(context).showSnackBar(
+          //   SnackBar(content: Text(message.message)),
+          // );
 
           // a real calculation
           var r = Random();
