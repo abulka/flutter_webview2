@@ -1,8 +1,5 @@
-import 'dart:async';
 import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:dart_random_choice/dart_random_choice.dart';
 import 'package:flutter_webview2/models/calculation.dart';
 import 'package:provider/provider.dart';
 
@@ -20,9 +17,6 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.teal,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-
-      // home: MyHomePage(title: 'ListView experiments'),
-
       home: Scaffold(
         appBar: AppBar(title: Text('ListViews')),
         body: BodyLayout(),
@@ -30,13 +24,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-// class BodyLayout extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return _myListView(context);
-//   }
-// }
 
 class BodyLayout extends StatelessWidget {
   @override
@@ -65,10 +52,13 @@ class BodyLayout extends StatelessWidget {
                   RaisedButton(
                     child: Text('Add'),
                     onPressed: () {
-                      print('xx');
                       var r = Random();
+                      var expression =
+                          '${r.nextInt(1000)} + ${r.nextInt(1000)}';
+                      if (r.nextInt(100) < 50)
+                        expression += ' / ${r.nextInt(1000)}';
                       final Calculation c = Calculation(
-                        expression: '${r.nextInt(1000)} + ${r.nextInt(1000)}',
+                        expression: expression,
                         completed: false,
                       );
                       Provider.of<CalculationsModel>(context, listen: false)
@@ -107,9 +97,8 @@ class AllCalculations extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child: Consumer<CalculationsModel>(
-        builder: (context, calculationModel, child) => CalculationList(
-          calculationModel: calculationModel
-        ),
+        builder: (context, calculationModel, child) =>
+            CalculationList(calculationModel: calculationModel),
       ),
     );
   }
@@ -143,12 +132,13 @@ class CalculationList extends StatelessWidget {
   /// Converts the pure model list of calculations into a list of widgets
   /// .map() returns a lazy iterable of the new thing, so .toList() forces computation
   /// not sure why we can't leave it as iterable - surely the build() method can cope?
-  /// 
-  /// Also, had to convert .map into .map<Widget> because type inference fails 
+  ///
+  /// Also, had to convert .map into .map<Widget> because type inference fails
   /// in an unexpected way - see https://stackoverflow.com/questions/49603021/type-listdynamic-is-not-a-subtype-of-type-listwidget
   List<Widget> convertModelToWidgets() {
     return calculationModel.allCalculations
-        .map<Widget>((calculation) => CalculationListItem(calculation: calculation))
+        .map<Widget>(
+            (calculation) => CalculationListItem(calculation: calculation))
         .toList();
   }
 }
@@ -181,72 +171,4 @@ class CalculationListItem extends StatelessWidget {
       ),
     );
   }
-}
-
-// ORI
-
-// replace this function with the code in the examples
-Widget _myListView(BuildContext context) {
-  final icons = [
-    Icons.directions_bike,
-    Icons.directions_boat,
-    Icons.directions_bus,
-    Icons.directions_car,
-    Icons.directions_railway,
-    Icons.directions_run,
-    Icons.directions_subway,
-    Icons.directions_transit,
-    Icons.directions_walk
-  ];
-
-  return ListView.separated(
-    itemCount: 10,
-    itemBuilder: (context, index) {
-      return ListTile(
-        leading: Icon(randomChoice(icons)),
-        title: Text('row $index'),
-        trailing: Icon(Icons.keyboard_arrow_right),
-        onTap: () {
-          print('Tapped on $index');
-          var future = _ackAlert(context, msg: 'Item $index');
-          print('Andy is ignoring dialog future var $future');
-        },
-      );
-    },
-    separatorBuilder: (context, index) {
-      return Divider();
-    },
-  );
-}
-
-Future<void> _ackAlert(BuildContext context, {String msg}) {
-  return showDialog<void>(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Not in stock'),
-        content: Text('$msg is no longer available'),
-        actions: <Widget>[
-          FlatButton(
-            child: Text('Ok'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          FlatButton(
-            child: Text('Ok2'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          Container(
-            height: 50,
-            color: Colors.amber[500],
-            child: const Center(child: Text('my text')),
-          ),
-          Icon(Icons.adjust),
-        ],
-      );
-    },
-  );
 }
