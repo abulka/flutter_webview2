@@ -107,21 +107,20 @@ class AllCalculations extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child: Consumer<CalculationsModel>(
-        builder: (context, calculations, child) => CalculationList(
-          calculations: calculations.allCalculations,
-          justAdded: calculations.justAdded,
+        builder: (context, calculationModel, child) => CalculationList(
+          calculationModel: calculationModel
         ),
       ),
     );
   }
 }
 
+/// Generate widgets from model
 class CalculationList extends StatelessWidget {
-  final List<Calculation> calculations; // from this model we generate widgets
-  final bool justAdded; // from model
+  final CalculationsModel calculationModel;
   final _scrollController = ScrollController();
 
-  CalculationList({@required this.calculations, this.justAdded});
+  CalculationList({@required this.calculationModel});
 
   _scrollToBottom() {
     // _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
@@ -131,7 +130,7 @@ class CalculationList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (justAdded)
+    if (calculationModel.justAdded)
       // Timer(Duration(milliseconds: 100), () => _scrollToBottom());
       WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
 
@@ -144,9 +143,12 @@ class CalculationList extends StatelessWidget {
   /// Converts the pure model list of calculations into a list of widgets
   /// .map() returns a lazy iterable of the new thing, so .toList() forces computation
   /// not sure why we can't leave it as iterable - surely the build() method can cope?
+  /// 
+  /// Also, had to convert .map into .map<Widget> because type inference fails 
+  /// in an unexpected way - see https://stackoverflow.com/questions/49603021/type-listdynamic-is-not-a-subtype-of-type-listwidget
   List<Widget> convertModelToWidgets() {
-    return calculations
-        .map((calculation) => CalculationListItem(calculation: calculation))
+    return calculationModel.allCalculations
+        .map<Widget>((calculation) => CalculationListItem(calculation: calculation))
         .toList();
   }
 }
