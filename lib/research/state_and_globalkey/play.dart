@@ -145,7 +145,7 @@ class AnotherButton extends StatelessWidget {
         onPressed: () {
           another.currentState.msg =
               'physics'; // official globalkey way works! 🔆🔆
-        },
+         },
       ),
     );
   }
