@@ -116,18 +116,23 @@ class AllCalculations extends StatelessWidget {
 }
 
 class CalculationList extends StatelessWidget {
-  final List<Calculation> calculations; // I guess this is the view model list
-  final _controller = ScrollController();
+  final List<Calculation> calculations; // from this model we generate widgets
+  final _scrollController = ScrollController();
 
   CalculationList({@required this.calculations});
 
+  _scrollToBottom() {
+    _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+  }
+
   @override
   Widget build(BuildContext context) {
-    // timer should only happen if hit add 
-    Timer(Duration(milliseconds: 100),
-        () => _controller.jumpTo(_controller.position.maxScrollExtent));
+    // scrolldown should only happen if hit add
+    // Timer(Duration(milliseconds: 100), () => _scrollToBottom());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+    
     return ListView(
-      controller: _controller,
+      controller: _scrollController,
       children: convertModelToWidgets(),
     );
   }
