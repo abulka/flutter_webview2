@@ -20,7 +20,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       routes: {
-        "/": (_) => WebViewTest(),
+        "/": (_) => ChangeNotifierProvider(
+            create: (context) => CalculationsModel(),
+            builder: (context, child) {
+              return WebViewTest();
+            })
       },
     );
   }
@@ -57,94 +61,90 @@ class _WebViewTestState extends State<WebViewTest> {
     return Scaffold(
       resizeToAvoidBottomInset: false, // avoid resize when keyboard appears
       appBar: AppBar(title: Text('Webview Little JS World')),
-      body: ChangeNotifierProvider(
-          create: (context) => CalculationsModel(),
-          builder: (context, child) {
-            return Column(
-              children: [
-                Container(
-                  height: 15,
-                  color: Colors.amber[500],
-                  child: const Center(
-                      child: Text('status indicators etc',
-                          style: TextStyle(
-                              fontSize: 10.0, fontWeight: FontWeight.bold))),
-                ),
-                Expanded(child: _myListView2(context)),
-                Container(
-                  color: Colors.amber,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextField(
-                      controller: txtController,
-                      decoration: InputDecoration(
-                          fillColor: Colors.white,
-                          filled: true,
-                          contentPadding: const EdgeInsets.only(
-                              left: 4.0, bottom: 2.0, top: 2.0),
-                          border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(1))),
-                          hintText: 'Enter a math term'),
-                      onChanged: (text) {
-                        print("text field so far...: $text");
-                      },
-                      onSubmitted: (value) {
-                        assert(value == txtController.text);
-                        doEval();
-                      },
-                    ),
-                  ),
-                ),
-                Row(
-                  children: [
-                    RaisedButton(
-                      onPressed: () {
-                        txtController.text = "math.evaluate('12.7 cm to inch')";
-                        txtController.selection = TextSelection.fromPosition(
-                          TextPosition(offset: txtController.text.length),
-                        );
-                      },
-                      child: Text('example to inch'),
-                    ),
-                    RaisedButton(
-                      onPressed: () => txtController.text =
-                          "math.evaluate('sin(45 deg) ^ 2')",
-                      child: Text('example sin'),
-                    ),
-                    RaisedButton(
-                      onPressed: () =>
-                          txtController.text = "math.pow([[-1, 2], [3, 1]], 2)",
-                      child: Text('example math.pow'),
-                    )
-                  ],
-                ),
-                Center(
-                  child: RaisedButton(
-                    color: Colors.green,
-                    onPressed: () {
-                      doEval();
-                    },
-                    child: Text('='),
-                  ),
-                ),
-                Container(
-                  height: 250,
-                  child: WebView(
-                    initialUrl: '',
-                    javascriptMode: JavascriptMode.unrestricted,
-                    onWebViewCreated: (WebViewController webViewController) {
-                      _webViewController = webViewController;
-                      _loadHtmlFromAssets();
-                    },
-                    javascriptChannels: <JavascriptChannel>[
-                      _toasterJavascriptChannel(context),
-                    ].toSet(),
-                  ),
-                ),
-              ],
-            );
-          }),
+      body: Column(
+        children: [
+          Container(
+            height: 15,
+            color: Colors.amber[500],
+            child: const Center(
+                child: Text('status indicators etc',
+                    style: TextStyle(
+                        fontSize: 10.0, fontWeight: FontWeight.bold))),
+          ),
+          Expanded(child: _myListView2(context)),
+          Container(
+            color: Colors.amber,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: txtController,
+                decoration: InputDecoration(
+                    fillColor: Colors.white,
+                    filled: true,
+                    contentPadding:
+                        const EdgeInsets.only(left: 4.0, bottom: 2.0, top: 2.0),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(1))),
+                    hintText: 'Enter a math term'),
+                onChanged: (text) {
+                  print("text field so far...: $text");
+                },
+                onSubmitted: (value) {
+                  assert(value == txtController.text);
+                  doEval();
+                },
+              ),
+            ),
+          ),
+          Row(
+            children: [
+              RaisedButton(
+                onPressed: () {
+                  txtController.text = "math.evaluate('12.7 cm to inch')";
+                  txtController.selection = TextSelection.fromPosition(
+                    TextPosition(offset: txtController.text.length),
+                  );
+                },
+                child: Text('example to inch'),
+              ),
+              RaisedButton(
+                onPressed: () =>
+                    txtController.text = "math.evaluate('sin(45 deg) ^ 2')",
+                child: Text('example sin'),
+              ),
+              RaisedButton(
+                onPressed: () =>
+                    txtController.text = "math.pow([[-1, 2], [3, 1]], 2)",
+                child: Text('example math.pow'),
+              )
+            ],
+          ),
+          Center(
+            child: RaisedButton(
+              color: Colors.green,
+              onPressed: () {
+                doEval();
+              },
+              child: Text('='),
+            ),
+          ),
+          Container(
+            height: 250,
+            child: WebView(
+              initialUrl: '',
+              javascriptMode: JavascriptMode.unrestricted,
+              onWebViewCreated: (WebViewController webViewController) {
+                _webViewController = webViewController;
+                _loadHtmlFromAssets();
+              },
+              javascriptChannels: <JavascriptChannel>[
+                _toasterJavascriptChannel(context),
+              ].toSet(),
+            ),
+          ),
+        ],
+      ),
+
       floatingActionButton: Builder(
         builder: (ctx) => FloatingActionButton(
           child: const Icon(Icons.add),
