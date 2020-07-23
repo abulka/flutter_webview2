@@ -24,23 +24,28 @@ class CalculationsModel extends ChangeNotifier {
     Calculation(expression: 'sin(90) / 1'),
   ];
 
+  bool justAdded = false;
+
   get allCalculations => _calculations;
   get incompleteCalculations => _calculations.where((c) => !c.completed);
   get completedCalculations => _calculations.where((c) => c.completed);
 
   void add(Calculation c) {
     _calculations.add(c);
+    justAdded = true;
     notifyListeners();
   }
 
   void toggleComplete(Calculation c) {
     final itemIndex = _calculations.indexOf(c);
     _calculations[itemIndex].toggleCompleted();
+    justAdded = false;
     notifyListeners();
   }
 
   void delete(Calculation c) {
     _calculations.remove(c);
+    justAdded = false;
     notifyListeners();
   }
 }
