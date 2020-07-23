@@ -33,6 +33,8 @@ dependencies:
   flutter_webview_plugin: ^0.3.11
   interactive_webview: ^0.1.2
   
+  dart_random_choice: ^0.0.2
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
