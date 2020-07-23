@@ -122,7 +122,9 @@ class CalculationList extends StatelessWidget {
   CalculationList({@required this.calculations});
 
   _scrollToBottom() {
-    _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    // _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    _scrollController.animateTo(_scrollController.position.maxScrollExtent,
+        duration: Duration(milliseconds: 300), curve: Curves.ease);
   }
 
   @override
@@ -130,7 +132,7 @@ class CalculationList extends StatelessWidget {
     // scrolldown should only happen if hit add
     // Timer(Duration(milliseconds: 100), () => _scrollToBottom());
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
-    
+
     return ListView(
       controller: _scrollController,
       children: convertModelToWidgets(),
