@@ -44,6 +44,7 @@ class _WebViewTestState extends State<WebViewTest> {
   WebViewController _webViewController;
   String filePath = 'assets/index_main.html';
   TextEditingController txtController;
+  Calculation nextCalculation;
   // String _input = '';
 
   // set input(String val) {
@@ -127,16 +128,6 @@ class _WebViewTestState extends State<WebViewTest> {
                 color: Colors.green,
                 onPressed: () {
                   doEval();
-
-                  // Dummy
-                  // var r = Random();
-                  // var expression = '${r.nextInt(1000)} + ${r.nextInt(1000)}';
-                  // if (r.nextInt(100) < 50) expression += ' / ${r.nextInt(1000)}';
-                  // final Calculation c = Calculation(
-                  //   expression: expression,
-                  //   completed: false,
-                  // );
-                  // Provider.of<CalculationsModel>(context, listen: false).add(c);
                 },
                 child: Text('='),
               ),
@@ -184,8 +175,12 @@ class _WebViewTestState extends State<WebViewTest> {
   }
 
   void doEval() {
-    var expr = txtController.text;
-    var s = 'result = $expr; Toaster.postMessage(result.toString())';
+    nextCalculation = Calculation(
+      expression: txtController.text,
+      completed: false,
+    );
+    var s =
+        'result = ${nextCalculation.expression}; Toaster.postMessage(result.toString())';
     print(s);
     _webViewController.evaluateJavascript(s);
   }
@@ -196,6 +191,7 @@ class _WebViewTestState extends State<WebViewTest> {
         onMessageReceived: (JavascriptMessage message) {
           print(
               'message from javascript: ${message.message} context: ${context.hashCode}');
+
           // andy secret way to comm to other code - should perhaps update a provider model?
           lastResult = message.message;
 
@@ -203,17 +199,9 @@ class _WebViewTestState extends State<WebViewTest> {
           //   SnackBar(content: Text(message.message)),
           // );
 
-          // a real calculation
-          var r = Random();
-          var expression = '${r.nextInt(1000)} + ${r.nextInt(1000)}';
-          if (r.nextInt(100) < 50) expression += ' / ${r.nextInt(1000)}';
-          expression += ' = ${message.message}';
-          final Calculation c = Calculation(
-            expression: expression,
-            completed: false,
-          );
-
-          Provider.of<CalculationsModel>(context, listen: false).add(c);
+          nextCalculation.answer = message.message;
+          nextCalculation.completed = true;
+          Provider.of<CalculationsModel>(context, listen: false).add(nextCalculation);
         });
   }
 
@@ -304,7 +292,7 @@ class CalculationListItem extends StatelessWidget {
               .toggleComplete(calculation);
         },
       ),
-      title: Text(calculation.expression),
+      title: Text('${calculation.expression} = ${calculation.answer}'),
       trailing: IconButton(
         icon: Icon(
           Icons.delete,
