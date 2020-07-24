@@ -141,8 +141,8 @@ class _WebViewTestState extends State<WebViewTest> {
     );
   }
 
-  Row exampleButtonsArea() {
-    return Row(
+  Wrap exampleButtonsArea() {
+    return Wrap(
       children: [
         RaisedButton(
           onPressed: () {
@@ -162,6 +162,11 @@ class _WebViewTestState extends State<WebViewTest> {
           onPressed: () =>
               txtController.text = "math.pow([[-1, 2], [3, 1]], 2)",
           child: Text('example math.pow'),
+        ),
+        RaisedButton(
+          onPressed: () =>
+              txtController.text = "math.complex({ r: math.sqrt(2), phi: math.pi / 4 })",
+          child: Text('complex({ r: sqrt(2), phi: pi / 4 })'),
         )
       ],
     );
