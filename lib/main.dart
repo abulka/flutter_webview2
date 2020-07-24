@@ -62,7 +62,7 @@ class _WebViewTestState extends State<WebViewTest> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false, // avoid resize when keyboard appears
+      // resizeToAvoidBottomInset: false, // avoid resize when keyboard appears
       appBar: AppBar(title: Text('Webview Little JS World')),
       body: Builder(
         builder: (ctx) => Column(
