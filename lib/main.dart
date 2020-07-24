@@ -68,10 +68,13 @@ class _WebViewTestState extends State<WebViewTest> {
         builder: (ctx) => Column(
           children: [
             statusIndicatorArea(),
-            Expanded(child: _myListView2(context)),
+            Expanded(
+              child: _myListView2(context),
+              flex: 2,
+            ),
             inputArea(),
-            exampleButtonsArea(),
-            equalsButtonArea(),
+            Expanded(child: exampleButtonsArea()),
+            // equalsButtonArea(),
             webViewArea(ctx),
           ],
         ),
@@ -103,13 +106,12 @@ class _WebViewTestState extends State<WebViewTest> {
 
   Container statusIndicatorArea() {
     return Container(
-            height: 15,
-            color: Colors.amber[500],
-            child: const Center(
-                child: Text('status indicators etc',
-                    style: TextStyle(
-                        fontSize: 10.0, fontWeight: FontWeight.bold))),
-          );
+      height: 15,
+      color: Colors.amber[500],
+      child: const Center(
+          child: Text('status indicators etc',
+              style: TextStyle(fontSize: 10.0, fontWeight: FontWeight.bold))),
+    );
   }
 
   Container webViewArea(BuildContext ctx) {
@@ -129,22 +131,32 @@ class _WebViewTestState extends State<WebViewTest> {
     );
   }
 
-  Center equalsButtonArea() {
-    return Center(
-      child: RaisedButton(
-        color: Colors.green,
-        onPressed: () {
-          doEval();
-        },
-        child: Text('='),
-      ),
-    );
-  }
+  // Center equalsButtonArea() {
+  //   return Center(
+  //     child: RaisedButton(
+  //       color: Colors.green,
+  //       onPressed: () {
+  //         doEval();
+  //       },
+  //       child: Text('='),
+  //     ),
+  //   );
+  // }
 
   SingleChildScrollView exampleButtonsArea() {
     return SingleChildScrollView(
-          child: Wrap(
+      child: Wrap(
         children: [
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: RaisedButton(
+              color: Colors.green,
+              onPressed: () {
+                doEval();
+              },
+              child: Text('='),
+            ),
+          ),
           RaisedButton(
             onPressed: () {
               txtController.text = "math.evaluate('12.7 cm to inch')";
@@ -165,10 +177,11 @@ class _WebViewTestState extends State<WebViewTest> {
             child: Text('example math.pow'),
           ),
           RaisedButton(
-            onPressed: () =>
-                txtController.text = "math.complex({ r: math.sqrt(2), phi: math.pi / 4 })",
+            onPressed: () => txtController.text =
+                "math.complex({ r: math.sqrt(2), phi: math.pi / 4 })",
             child: Text('complex({ r: sqrt(2), phi: pi / 4 })'),
           ),
+
           // Container(color: Colors.redAccent, height: 30, width: 130,),
           // Container(color: Colors.red[200], height: 30, width: 130,),
           // Container(color: Colors.red[300], height: 30, width: 130,),
