@@ -77,27 +77,27 @@ class _WebViewTestState extends State<WebViewTest> {
         ),
       ),
 
-      floatingActionButton: Builder(
-        builder: (ctx) => FloatingActionButton(
-          child: const Icon(Icons.add),
-          onPressed: () {
-            Scaffold.of(ctx).showSnackBar(
-              SnackBar(
-                content: Text('Calling JS2...'),
-                behavior: SnackBarBehavior.floating,
-                backgroundColor: Colors.blueGrey[200],
-                duration: Duration(milliseconds: 200),
-              ),
-            );
-            _webViewController
-                // .evaluateJavascript('fred_add_via_timeout_which_posts(10, 10)');
-                // .evaluateJavascript('add(10, 10)');
-                // .evaluateJavascript('mathjs1(10, 10)');
-                .evaluateJavascript(
-                    'result = math.sqrt(-2).toString(); Toaster.postMessage(result)');
-          },
-        ),
-      ),
+      // floatingActionButton: Builder(
+      //   builder: (ctx) => FloatingActionButton(
+      //     child: const Icon(Icons.add),
+      //     onPressed: () {
+      //       Scaffold.of(ctx).showSnackBar(
+      //         SnackBar(
+      //           content: Text('Calling JS2...'),
+      //           behavior: SnackBarBehavior.floating,
+      //           backgroundColor: Colors.blueGrey[200],
+      //           duration: Duration(milliseconds: 200),
+      //         ),
+      //       );
+      //       _webViewController
+      //           // .evaluateJavascript('fred_add_via_timeout_which_posts(10, 10)');
+      //           // .evaluateJavascript('add(10, 10)');
+      //           // .evaluateJavascript('mathjs1(10, 10)');
+      //           .evaluateJavascript(
+      //               'result = math.sqrt(-2).toString(); Toaster.postMessage(result)');
+      //     },
+      //   ),
+      // ),
     );
   }
 
@@ -114,7 +114,7 @@ class _WebViewTestState extends State<WebViewTest> {
 
   Container webViewArea(BuildContext ctx) {
     return Container(
-      height: 250,
+      height: 1,
       child: WebView(
         initialUrl: '',
         javascriptMode: JavascriptMode.unrestricted,
