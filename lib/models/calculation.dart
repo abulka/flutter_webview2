@@ -48,4 +48,10 @@ class CalculationsModel extends ChangeNotifier {
     justAdded = false;
     notifyListeners();
   }
+
+  void clear() {
+    _calculations.clear();
+    notifyListeners();
+    justAdded = false;
+  }
 }

@@ -45,13 +45,7 @@ class _WebViewTestState extends State<WebViewTest> {
   String filePath = 'assets/index_main.html';
   TextEditingController txtController;
   Calculation nextCalculation;
-  // String _input = '';
-
-  // set input(String val) {
-  //   setState(() {
-  //     _input = val;
-  //   });
-  // }
+  double _sliderValue = 50;
 
   @override
   void initState() {
@@ -157,6 +151,30 @@ class _WebViewTestState extends State<WebViewTest> {
               child: Text('='),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: RaisedButton(
+              color: Colors.red[400],
+              onPressed: () {
+                doClear();
+              },
+              child: Text('Clear'),
+            ),
+          ),
+          Container(
+            width: 200,
+            child: Slider(
+              value: _sliderValue,
+              min: 1,
+              max: 100,
+              onChanged: (double value) {
+                setState(() {
+                  _sliderValue = value;
+                  print('slider!');
+                });
+              },
+            ),
+          ),
           RaisedButton(
             onPressed: () {
               txtController.text = "math.evaluate('12.7 cm to inch')";
@@ -228,6 +246,10 @@ class _WebViewTestState extends State<WebViewTest> {
         'result = ${nextCalculation.expression}; Toaster.postMessage(result.toString())';
     print(s);
     _webViewController.evaluateJavascript(s);
+  }
+
+  void doClear() {
+    Provider.of<CalculationsModel>(context, listen: false).clear();
   }
 
   JavascriptChannel _toasterJavascriptChannel(BuildContext context) {
