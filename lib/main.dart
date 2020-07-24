@@ -141,34 +141,41 @@ class _WebViewTestState extends State<WebViewTest> {
     );
   }
 
-  Wrap exampleButtonsArea() {
-    return Wrap(
-      children: [
-        RaisedButton(
-          onPressed: () {
-            txtController.text = "math.evaluate('12.7 cm to inch')";
-            txtController.selection = TextSelection.fromPosition(
-              TextPosition(offset: txtController.text.length),
-            );
-          },
-          child: Text('example to inch'),
-        ),
-        RaisedButton(
-          onPressed: () =>
-              txtController.text = "math.evaluate('sin(45 deg) ^ 2')",
-          child: Text('example sin'),
-        ),
-        RaisedButton(
-          onPressed: () =>
-              txtController.text = "math.pow([[-1, 2], [3, 1]], 2)",
-          child: Text('example math.pow'),
-        ),
-        RaisedButton(
-          onPressed: () =>
-              txtController.text = "math.complex({ r: math.sqrt(2), phi: math.pi / 4 })",
-          child: Text('complex({ r: sqrt(2), phi: pi / 4 })'),
-        )
-      ],
+  SingleChildScrollView exampleButtonsArea() {
+    return SingleChildScrollView(
+          child: Wrap(
+        children: [
+          RaisedButton(
+            onPressed: () {
+              txtController.text = "math.evaluate('12.7 cm to inch')";
+              txtController.selection = TextSelection.fromPosition(
+                TextPosition(offset: txtController.text.length),
+              );
+            },
+            child: Text('example to inch'),
+          ),
+          RaisedButton(
+            onPressed: () =>
+                txtController.text = "math.evaluate('sin(45 deg) ^ 2')",
+            child: Text('example sin'),
+          ),
+          RaisedButton(
+            onPressed: () =>
+                txtController.text = "math.pow([[-1, 2], [3, 1]], 2)",
+            child: Text('example math.pow'),
+          ),
+          RaisedButton(
+            onPressed: () =>
+                txtController.text = "math.complex({ r: math.sqrt(2), phi: math.pi / 4 })",
+            child: Text('complex({ r: sqrt(2), phi: pi / 4 })'),
+          ),
+          // Container(color: Colors.redAccent, height: 30, width: 130,),
+          // Container(color: Colors.red[200], height: 30, width: 130,),
+          // Container(color: Colors.red[300], height: 30, width: 130,),
+          // Container(color: Colors.red[400], height: 30, width: 130,),
+          // Container(color: Colors.red[600], height: 30, width: 130,),
+        ],
+      ),
     );
   }
 
