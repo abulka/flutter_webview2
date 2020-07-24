@@ -45,7 +45,6 @@ class _WebViewTestState extends State<WebViewTest> {
   String filePath = 'assets/index_main.html';
   TextEditingController txtController;
   Calculation nextCalculation;
-  double _sliderValue = 50;
 
   @override
   void initState() {
@@ -163,17 +162,7 @@ class _WebViewTestState extends State<WebViewTest> {
           ),
           Container(
             width: 200,
-            child: Slider(
-              value: _sliderValue,
-              min: 1,
-              max: 100,
-              onChanged: (double value) {
-                setState(() {
-                  _sliderValue = value;
-                  print('slider!');
-                });
-              },
-            ),
+            child: SliderAndy(),
           ),
           RaisedButton(
             onPressed: () {
@@ -371,6 +360,35 @@ class CalculationListItem extends StatelessWidget {
               .delete(calculation);
         },
       ),
+    );
+  }
+}
+
+// SLIDER
+
+class SliderAndy extends StatefulWidget {
+  SliderAndy({Key key}) : super(key: key);
+
+  @override
+  _SliderAndyState createState() => _SliderAndyState();
+}
+
+class _SliderAndyState extends State<SliderAndy> {
+  double _value = 0;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+       child: Slider(
+         min: 0,
+         max: 100,
+         value: _value,
+         onChanged: (value) {
+           setState(() {
+             _value = value;
+             print('slider!');
+           });
+         },
+       ),
     );
   }
 }
