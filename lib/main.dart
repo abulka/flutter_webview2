@@ -188,6 +188,11 @@ class _WebViewTestState extends State<WebViewTest> {
                 "math.complex({ r: math.sqrt(2), phi: math.pi / 4 })",
             child: Text('complex({ r: sqrt(2), phi: pi / 4 })'),
           ),
+          RaisedButton(
+            onPressed: () => txtController.text =
+                "math.random(1,1000)",
+            child: Text('math.random(1,1000)'),
+          ),
 
           // Container(color: Colors.redAccent, height: 30, width: 130,),
           // Container(color: Colors.red[200], height: 30, width: 130,),
