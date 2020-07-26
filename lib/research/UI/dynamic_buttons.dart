@@ -58,7 +58,15 @@ class BodyLayout extends StatelessWidget {
 
   Expanded exampleButtonsArea() {
     List columnHeaders = ['a', 'b', 'c', 'd'];
-    List buttonLabels = ['Do a', 'Do b', 'Do c', 'Do d'];
+    List labelChoices = [
+      'Who',
+      'do',
+      'we',
+      'think',
+      'drink',
+      'philosophy',
+      'fluttering'
+    ];
     return Expanded(
       child: SingleChildScrollView(
         child: Consumer<MyModel>(
@@ -78,6 +86,18 @@ class BodyLayout extends StatelessWidget {
                     ..add('there')
                     ..add('how')
                     ..add('are you?');
+                },
+              ),
+              RaisedButton(
+                child: Text('add TONS of buttons'),
+                onPressed: () {
+                  var model = Provider.of<MyModel>(context, listen: false);
+                  var high = Random().nextInt(40);
+                  for (var i = 10; i < 10 + high; i++) {
+                    var label =
+                        '${randomChoice(labelChoices)} ${i - 10}/$high';
+                    model.add(label);
+                  }
                 },
               ),
               Container(
