@@ -47,6 +47,7 @@ class BodyLayout extends StatelessWidget {
 
   Expanded exampleButtonsArea() {
     List columnHeaders = ['a', 'b', 'c', 'd'];
+    List buttonLabels = ['Do a', 'Do b', 'Do c', 'Do d'];
     return Expanded(
       child: SingleChildScrollView(
         child: Wrap(
@@ -92,21 +93,38 @@ class BodyLayout extends StatelessWidget {
               height: 30,
               width: 130,
             ),
-          ]..addAll(columnHeaders
-              .map((header) => new Container(
-                    color: randomChoice([Colors.amber, Colors.green, Colors.blue[400], Colors.orange, Colors.indigo[200]]),
-                    alignment: FractionalOffset.center,
-                    width: 120.0,
-                    margin: EdgeInsets.all(3.0),
-                    padding: const EdgeInsets.only(
-                        top: 5.0, bottom: 5.0, right: 3.0, left: 3.0),
-                    child: new Text(
-                      header,
-                      style: TextStyle(color: Colors.grey[800]),
-                      textAlign: TextAlign.center,
-                    ),
-                  ))
-              .toList()),
+          ]
+            ..addAll(columnHeaders
+                .map((header) => new Container(
+                      color: randomChoice([
+                        Colors.amber,
+                        Colors.green,
+                        Colors.blue[400],
+                        Colors.orange,
+                        Colors.indigo[200]
+                      ]),
+                      alignment: FractionalOffset.center,
+                      width: 120.0,
+                      margin: EdgeInsets.all(3.0),
+                      padding: const EdgeInsets.only(
+                          top: 5.0, bottom: 5.0, right: 3.0, left: 3.0),
+                      child: new Text(
+                        header,
+                        style: TextStyle(color: Colors.grey[800]),
+                        textAlign: TextAlign.center,
+                      ),
+                    ))
+                .toList())
+            ..addAll(buttonLabels
+                .map((label) => Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: RaisedButton(
+                        child: Text('example button $label'),
+                        onPressed: () {},
+                        padding: EdgeInsets.all(30),
+                      ),
+                ))
+                .toList()),
         ),
       ),
     );
