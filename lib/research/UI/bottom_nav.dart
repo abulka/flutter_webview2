@@ -37,22 +37,43 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   int _selectedIndex = 0;
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+
   // this is a list of content widgets - one per page
+  // but cannot embed $_selectedIndex in what is returned cos its
+  // a compile time creation - even if 'static const ' is removed
+  // 
   // static const List<Widget> _widgetOptions = <Widget>[
-  List<Widget> _widgetOptions = <Widget>[
-    Text(
-      'Index 0: Home',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 1: Business',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 2: School',
-      style: optionStyle,
-    ),
-  ];
+  //   Text(
+  //     'Index 0: Home',
+  //     style: optionStyle,
+  //   ),
+  //   Text(
+  //     'Index 1: Business',
+  //     style: optionStyle,
+  //   ),
+  //   Text(
+  //     'Index 2: School',
+  //     style: optionStyle,
+  //   ),
+  // ];
+
+  Widget getPage() {
+    List<Widget> _widgetOptions = <Widget>[
+      Text(
+        'Andy Index 0: Home',
+        style: optionStyle,
+      ),
+      Text(
+        'Andy Index $_selectedIndex: Business',
+        style: optionStyle,
+      ),
+      Text(
+        'Andy Index 2: School',
+        style: optionStyle,
+      ),
+    ];
+    return _widgetOptions.elementAt(_selectedIndex);
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -68,7 +89,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
         title: const Text('BottomNavigationBar Sample'),
       ),
       body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
+        // child: _widgetOptions.elementAt(_selectedIndex),
+        child: getPage(),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
