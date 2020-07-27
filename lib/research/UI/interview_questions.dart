@@ -47,12 +47,6 @@ class BodyLayout extends StatelessWidget {
         builder: (context, child) {
           return Column(
             children: [
-              Container(
-                height: 50,
-                color: Colors.amber[500],
-                child: const Center(child: Text('... is what flutter does!')),
-              ),
-              inputArea(),
               MyTextWidget(),
               MyTextWidget(
                 kind: Kind.fittedBox,
@@ -71,29 +65,7 @@ class BodyLayout extends StatelessWidget {
         });
   }
 
-  Container inputArea() {
-    return Container(
-      color: Colors.amber,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: TextField(
-          decoration: InputDecoration(
-              fillColor: Colors.white,
-              filled: true,
-              contentPadding:
-                  const EdgeInsets.only(left: 4.0, bottom: 2.0, top: 2.0),
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(1))),
-              hintText: 'Enter a math term'),
-          onChanged: (text) {
-            print("text field so far...: $text");
-          },
-          onSubmitted: (value) {},
-        ),
-      ),
-    );
-  }
-}
+ }
 
 // Text Widget variants
 
