@@ -41,7 +41,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   // this is a list of content widgets - one per page
   // but cannot embed $_selectedIndex in what is returned cos its
   // a compile time creation - even if 'static const ' is removed
-  // 
+  //
   // static const List<Widget> _widgetOptions = <Widget>[
   //   Text(
   //     'Index 0: Home',
@@ -59,18 +59,23 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
 
   Widget getPage() {
     List<Widget> _widgetOptions = <Widget>[
-      Text(
-        'Andy Index 0: Home',
-        style: optionStyle,
+      Center(
+        child: Text(
+          'Andy Index 0: Home',
+          style: optionStyle,
+        ),
       ),
-      Text(
-        'Andy Index $_selectedIndex: Business',
-        style: optionStyle,
+      Center(
+        child: Text(
+          'Andy Index $_selectedIndex: Business',
+          style: optionStyle,
+        ),
       ),
-      Text(
-        'Andy Index 2: School',
-        style: optionStyle,
-      ),
+      SchoolPage(index: _selectedIndex),
+      // Text(
+      //   'Andy Index 2: School',
+      //   style: optionStyle,
+      // ),
     ];
     return _widgetOptions.elementAt(_selectedIndex);
   }
@@ -88,10 +93,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       appBar: AppBar(
         title: const Text('BottomNavigationBar Sample'),
       ),
-      body: Center(
-        // child: _widgetOptions.elementAt(_selectedIndex),
-        child: getPage(),
-      ),
+      body: getPage(),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -110,6 +112,40 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.amber[800],
         onTap: _onItemTapped,
+      ),
+    );
+  }
+}
+
+// School widget
+
+class SchoolPage extends StatelessWidget {
+  final int _selectedIndex;
+  const SchoolPage({Key key, int index = 22}) : _selectedIndex = index, super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          // looks like you can refer to $_selectedIndex here, probably because
+          // this is more dynamic code - not a compile time variable declaration
+          Text(
+            'Andy Index $_selectedIndex: School',
+            // style: optionStyle,
+          ),
+          Container(
+            height: 50,
+            color: Colors.amber[500],
+            child: const Center(child: Text('hi there')),
+          ),
+          RaisedButton(
+            onPressed: () {
+              print('hi');
+            },
+            child: Text('press me'),
+          ),
+        ],
       ),
     );
   }
