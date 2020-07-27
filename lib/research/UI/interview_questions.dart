@@ -60,12 +60,12 @@ class BodyLayout extends StatelessWidget {
               MyTextWidget(
                 kind: Kind.expandedFittedBox,
               ),
+              NestedScaffolds(),
             ],
           );
         });
   }
-
- }
+}
 
 // Text Widget variants
 
@@ -127,5 +127,45 @@ class MyTextWidget extends StatelessWidget {
       widget,
       Icon(Icons.airline_seat_legroom_reduced),
     ]);
+  }
+}
+
+class NestedScaffolds extends StatelessWidget {
+  const NestedScaffolds({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 200,
+      child: Scaffold(
+        appBar: AppBar(title: Text('sub scaffold')),
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            color: Colors.red,
+            height: 200,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Scaffold(
+                appBar: AppBar(title: Text('sub sub scaffold')),
+                body: Row(
+                  // mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        color: Colors.blue,
+                        height: 100,
+                        child: Text('body of sub sub'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
