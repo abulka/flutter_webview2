@@ -355,10 +355,6 @@ class _JobsWidgetPuzzleState extends State<JobsWidgetPuzzle> {
         RaisedButton(
           onPressed: () {
             print('fetchJobs().then');
-            // futureJobs = fetchJobs();
-            // print('on pressed, futureJobs = $futureJobs');
-            // var jobs = await fetchJobs();
-
             fetchJobs().then((result) {
               // print('fetchJobs().then, result = $result');
               print('fetchJobs().then, ${result.map((job) => job.title)}');
@@ -401,15 +397,19 @@ class _JobsWidgetPuzzleState extends State<JobsWidgetPuzzle> {
 // }
 
 Future<List<Job>> fetchJobs() async {
+  // THIS MORE COMPLEX INVOCATION WORKS OK TOO
   // print('fetchJobs()');
-  final host = 'jobs.github.com';
-  final path = 'positions.json';
-  final queryParameters = {'location': 'remote'};
-  final headers = {'Accept': 'application/json'};
-  final uri = Uri.https(host, path, queryParameters);
-  final results = await http.get(uri, headers: headers);
+  // final host = 'jobs.github.com';
+  // final path = 'positions.json';
+  // final queryParameters = {'location': 'remote'};
+  // final headers = {'Accept': 'application/json'};
+  // final uri = Uri.https(host, path, queryParameters);
+  // final results = await http.get(uri, headers: headers);
+
+  final results = await http
+        .get('https://jobs.github.com/positions.json?location=remote');
   print(
-      'fetchJobs() result after await $results where status = ${results.statusCode}');
+      'fetchJobs() result after await, status = ${results.statusCode}');
   final jsonList = json.decode(results.body) as List;
   // print('fetchJobs() jsonList = $jsonList');
   return jsonList.map((job) => Job.fromJson(job)).toList();
