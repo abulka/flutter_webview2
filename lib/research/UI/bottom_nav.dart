@@ -71,7 +71,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           style: optionStyle,
         ),
       ),
-      SchoolPage(index: _selectedIndex),
+      // SchoolPage(index: _selectedIndex), // if don't pass in the optionStyle it will be null, but that's rendered OK
+      SchoolPage(index: _selectedIndex, optionStyle: optionStyle),
       // Text(
       //   'Andy Index 2: School',
       //   style: optionStyle,
@@ -121,19 +122,20 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
 
 class SchoolPage extends StatelessWidget {
   final int _selectedIndex;
-  const SchoolPage({Key key, int index = 22}) : _selectedIndex = index, super(key: key);
+  final optionStyle;  // if don't pass in the optionStyle it will be null, but that's rendered OK
+  const SchoolPage({Key key, int index = 22, this.optionStyle})
+      : _selectedIndex = index,
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    print(
+        'building school page with $_selectedIndex and optionStyle $optionStyle');
     return Container(
       child: Column(
         children: [
-          // looks like you can refer to $_selectedIndex here, probably because
+          // looks like you CAN refer to $_selectedIndex here, probably because
           // this is more dynamic code - not a compile time variable declaration
-          Text(
-            'Andy Index $_selectedIndex: School',
-            // style: optionStyle,
-          ),
           Container(
             height: 50,
             color: Colors.amber[500],
@@ -144,6 +146,14 @@ class SchoolPage extends StatelessWidget {
               print('hi');
             },
             child: Text('press me'),
+          ),
+          Expanded(
+            child: Center(
+              child: Text(
+                'Andy Index $_selectedIndex: School',
+                style: optionStyle,
+              ),
+            ),
           ),
         ],
       ),
