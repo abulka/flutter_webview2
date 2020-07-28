@@ -41,15 +41,17 @@ class MyDogModel extends ChangeNotifier {
       var v = json.decode(res.body);
       imageUrl = v['message'];
       notifyListeners();
-      // setState(() {
-      //   imageUrl = v['message'];
-      // });
     }
   }
+}
 
-  // newDogPlease() {
-  //   notifyListeners();
-  // }
+class MyJobsModel extends ChangeNotifier {
+  List<Job> jobs; // interesting we don't have to declare this Future<List<Job>>
+  fetchData() async {
+    jobs = await fetchJobs();
+    print('After MyJobsModel await, result = ${jobs.map((job) => job.title)}');
+    notifyListeners();
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -75,8 +77,14 @@ class MyApp extends StatelessWidget {
 class BodyLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-        create: (context) => MyDogModel(),
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider<MyDogModel>(create: (context) => MyDogModel()),
+          ChangeNotifierProvider<MyJobsModel>(
+              create: (context) => MyJobsModel()),
+        ],
+        // ChangeNotifierProvider(
+        //   create: (context) => MyDogModel(),
         builder: (context, child) {
           return Column(
             children: [
@@ -84,19 +92,23 @@ class BodyLayout extends StatelessWidget {
               // question puzzle) we had to add the Expanded() widget. But if we
               // add Expanded() here, it pushes the text area to be HUGE and
               // taking up most of the screen!
-              Text(dedent('''
-                  Fetching Jobs only works in an emulator - not in chrome browser. 
-                  Because "access-control-allow-origin: *" is not the header 
-                  coming back from the Jobs server.
-                  https://jobs.github.com/positions.json?location=remote
-                  
-                  AAA aasdassd das adss  lsdkjf lsdkjf lsdkjf lskdjf lskdjf lskdjflksd jflksdj flksdj flksdjf lksdjf lskdjf lksd sldkfjsdlkfj lsdkjf lskdjf lksdjf lskdjf l ldskjf lsdkjf lskdfj lskdfj lsdkjf
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Text(dedent('''
+                      Fetching Jobs only works in an emulator - not in chrome browser. 
+                      Because "access-control-allow-origin: *" is not the header 
+                      coming back from the Jobs server.
+                      https://jobs.github.com/positions.json?location=remote
+                      
+                      AAA aasdassd das adss  lsdkjf lsdkjf lsdkjf lskdjf lskdjf lskdjflksd jflksdj flksdj flksdjf lksdjf lskdjf lksd sldkfjsdlkfj lsdkjf lskdjf lksdjf lskdjf l ldskjf lsdkjf lskdfj lskdfj lsdkjf
 
-                  However this endpoint 
-                  https://dog.ceo/api/breeds/image/random (API doco: https://dog.ceo/dog-api/documentation/random)
-                  does return "access-control-allow-origin: *" in the header (yay)
-                  So fetching dog pictures should work in chrome.
-                  ''')),
+                      However this endpoint 
+                      https://dog.ceo/api/breeds/image/random (API doco: https://dog.ceo/dog-api/documentation/random)
+                      does return "access-control-allow-origin: *" in the header (yay)
+                      So fetching dog pictures should work in chrome.
+                      ''')),
+                ),
+              ),
 
               JobsWidgetPuzzle(),
             ],
@@ -167,23 +179,35 @@ class _JobsWidgetPuzzleState extends State<JobsWidgetPuzzle> {
           color: Colors.green,
           thickness: 2,
         ),
-        RaisedButton(
-          onPressed: () {
-            print('fetchJobs().then');
-            fetchJobs().then((result) {
-              // print('fetchJobs().then, result = $result');
-              print('fetchJobs().then, ${result.map((job) => job.title)}');
-            });
-          },
-          child: Text('fetchJobs().then()'),
-        ),
-        RaisedButton(
-          onPressed: () async {
-            print('fetchJobs() async await');
-            var result = await fetchJobs();
-            print('In await, result = ${result.map((job) => job.title)}');
-          },
-          child: Text('fetchJobs() async await'),
+
+        Row(
+          children: [
+            RaisedButton(
+              onPressed: () {
+                print('fetchJobs().then');
+                fetchJobs().then((result) {
+                  // print('fetchJobs().then, result = $result');
+                  print('fetchJobs().then, ${result.map((job) => job.title)}');
+                });
+              },
+              child: Text('fetchJobs().then()'),
+            ),
+            RaisedButton(
+              onPressed: () async {
+                print('fetchJobs() async await');
+                var result = await fetchJobs();
+                print('In await, result = ${result.map((job) => job.title)}');
+              },
+              child: Text('fetchJobs() async await'),
+            ),
+            RaisedButton(
+              onPressed: () async {
+                print('fetchJobs() via model');
+                Provider.of<MyJobsModel>(context, listen: false).fetchData();
+              },
+              child: Text('fetchJobs() via model'),
+            ),
+          ],
         ),
         Divider(
           color: Colors.green[200],
@@ -350,8 +374,8 @@ class HttpRequestDogDemo2 extends StatelessWidget {
         child: Center(
           child: Image.network(
             imageUrl,
-            height: MediaQuery.of(context).size.height / 6,
-            width: MediaQuery.of(context).size.width / 6,
+            height: MediaQuery.of(context).size.height / 4,
+            width: MediaQuery.of(context).size.width / 4,
           ),
         ));
   }
