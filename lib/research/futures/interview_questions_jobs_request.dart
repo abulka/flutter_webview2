@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:provider/provider.dart';
 import 'dart:convert'; // for json.decode
 import 'package:http/http.dart' as http;
+import 'package:dedent/dedent.dart'; // my dedent library
 
 // interview question puzzles - Future with a List of Jobs
 // https://www.raywenderlich.com/10971345-flutter-interview-questions-and-answers#toc-anchor-015
@@ -31,7 +32,9 @@ void main() {
 }
 
 class MyModel extends ChangeNotifier {
-  // NOT USED YET IN THESE EXAMPLES
+  newDogPlease() {
+    notifyListeners();
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -66,8 +69,19 @@ class BodyLayout extends StatelessWidget {
               // question puzzle) we had to add the Expanded() widget. But if we
               // add Expanded() here, it pushes the text area to be HUGE and
               // taking up most of the screen!
-              Text(
-                  'This only works in an emulator - not in chrome browser. \n\nAAA aasdassd das adss  lsdkjf lsdkjf lsdkjf lskdjf lskdjf lskdjflksd jflksdj flksdj flksdjf lksdjf lskdjf lksd sldkfjsdlkfj lsdkjf lskdjf lksdjf lskdjf l ldskjf lsdkjf lskdfj lskdfj lsdkjf'),
+              Text(dedent('''
+                  Fetching Jobs only works in an emulator - not in chrome browser. 
+                  Because "access-control-allow-origin: *" is not the header 
+                  coming back from the Jobs server.
+                  https://jobs.github.com/positions.json?location=remote
+                  
+                  AAA aasdassd das adss  lsdkjf lsdkjf lsdkjf lskdjf lskdjf lskdjflksd jflksdj flksdj flksdjf lksdjf lskdjf lksd sldkfjsdlkfj lsdkjf lskdjf lksdjf lskdjf l ldskjf lsdkjf lskdfj lskdfj lsdkjf
+
+                  However this endpoint 
+                  https://dog.ceo/api/breeds/image/random (API doco: https://dog.ceo/dog-api/documentation/random)
+                  does return "access-control-allow-origin: *" in the header (yay)
+                  So fetching dog pictures should work in chrome.
+                  ''')),
 
               JobsWidgetPuzzle(),
             ],
@@ -155,7 +169,19 @@ class _JobsWidgetPuzzleState extends State<JobsWidgetPuzzle> {
             print('In await, result = ${result.map((job) => job.title)}');
           },
           child: Text('fetchJobs() async await'),
-        )
+        ),
+        Divider(
+          color: Colors.green[200],
+          thickness: 2,
+        ),
+        RaisedButton(
+          onPressed: () {
+            Provider.of<MyModel>(context, listen: false).newDogPlease();
+          },
+          child: Text('Fetch Dog picture'),
+        ),
+        Consumer<MyModel>(
+            builder: (context, myModel, child) => HttpRequestDogDemo()),
       ],
     );
   }
@@ -200,4 +226,58 @@ Future<List<Job>> fetchJobs() async {
   final jsonList = json.decode(results.body) as List;
   // print('fetchJobs() jsonList = $jsonList');
   return jsonList.map((job) => Job.fromJson(job)).toList();
+}
+
+// Fetching Dog pictures
+// https://stackoverflow.com/questions/58557173/how-to-make-http-request-work-in-flutter-web
+
+class HttpRequestDogDemo extends StatefulWidget {
+  @override
+  _HttpRequestDogDemoState createState() => _HttpRequestDogDemoState();
+}
+
+class _HttpRequestDogDemoState extends State<HttpRequestDogDemo> {
+  String imageUrl = "";
+
+  @override
+  void initState() {
+    // fetchData();
+    super.initState();
+    // WidgetsBinding.instance
+    //     .addPostFrameCallback((_) => fetchData());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    print('DOG WIDGET BEING BUILT');
+    return Container(
+        child: Column(
+      children: <Widget>[
+        Center(
+          child: Image.network(
+            imageUrl,
+            height: MediaQuery.of(context).size.height / 3,
+            width: MediaQuery.of(context).size.width / 3,
+          ),
+        ),
+        FloatingActionButton(
+          child: Icon(Icons.cloud_download),
+          onPressed: () {
+            fetchData();
+          },
+        )
+      ],
+    ));
+  }
+
+  fetchData() async {
+    final res = await http.get("https://dog.ceo/api/breeds/image/random");
+
+    if (res.statusCode == 200) {
+      var v = json.decode(res.body);
+      setState(() {
+        imageUrl = v['message'];
+      });
+    }
+  }
 }
