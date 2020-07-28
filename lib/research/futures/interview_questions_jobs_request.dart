@@ -177,11 +177,30 @@ class _JobsWidgetPuzzleState extends State<JobsWidgetPuzzle> {
         RaisedButton(
           onPressed: () {
             Provider.of<MyModel>(context, listen: false).newDogPlease();
+            // Disabled using a Consumer because we don't want to build anything,
+            // we instead want to trigger Dog fetchData() which in turn
+            // will trigger the build once the data has arrived.
+            // The question is whether provider allows a receiver of the notifyall
+            // to be a regular method somewhere? NO
+
+            // Alternatively we might need a futurebuilder where the image
+            // gets build once the http call has been received, as represented
+            // as a future.
+            //
+            // Then again the initial implementation has the method await on
+            // the http call then set state, which triggers the build - sounds
+            // like an alternative to future builder!? ;-)
+
+            /// AHA what about putting the fetching of the jobs in the model
+            /// then when the jobs arrive, we notifylisteners.  this sounds
+            /// sensible!
+
           },
           child: Text('Fetch Dog picture'),
         ),
-        Consumer<MyModel>(
-            builder: (context, myModel, child) => HttpRequestDogDemo()),
+        // Consumer<MyModel>(
+        //     builder: (context, myModel, child) => HttpRequestDogDemo()),
+        HttpRequestDogDemo(),
       ],
     );
   }
@@ -241,23 +260,37 @@ class _HttpRequestDogDemoState extends State<HttpRequestDogDemo> {
 
   @override
   void initState() {
+    print('DOG WIDGET - initState()');
+
+    // this only happens once ever during the app.
     // fetchData();
+
     super.initState();
+
+    // this only happens once ever during the app.
     // WidgetsBinding.instance
     //     .addPostFrameCallback((_) => fetchData());
   }
 
+  Consumer<MyModel>(
+    builder: (context, myModel, child) => print );
+
   @override
   Widget build(BuildContext context) {
-    print('DOG WIDGET BEING BUILT');
+    print('DOG WIDGET - build()');
+
+    // Yeah, this just sets off an infinit loop, cos the fetchData() triggers
+    // a build() and the build triggers a fetchData() etc.
+    // WidgetsBinding.instance.addPostFrameCallback((_) => fetchData());
+
     return Container(
         child: Column(
       children: <Widget>[
         Center(
           child: Image.network(
             imageUrl,
-            height: MediaQuery.of(context).size.height / 3,
-            width: MediaQuery.of(context).size.width / 3,
+            height: MediaQuery.of(context).size.height / 6,
+            width: MediaQuery.of(context).size.width / 6,
           ),
         ),
         FloatingActionButton(
