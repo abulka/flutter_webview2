@@ -272,9 +272,6 @@ class _HttpRequestDogDemoState extends State<HttpRequestDogDemo> {
     //     .addPostFrameCallback((_) => fetchData());
   }
 
-  Consumer<MyModel>(
-    builder: (context, myModel, child) => print );
-
   @override
   Widget build(BuildContext context) {
     print('DOG WIDGET - build()');
