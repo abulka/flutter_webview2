@@ -31,10 +31,25 @@ void main() {
   runApp(MyApp());
 }
 
-class MyModel extends ChangeNotifier {
-  newDogPlease() {
-    notifyListeners();
+class MyDogModel extends ChangeNotifier {
+  String imageUrl = "https://placeimg.com/64/48/any";
+
+  fetchData() async {
+    final res = await http.get("https://dog.ceo/api/breeds/image/random");
+
+    if (res.statusCode == 200) {
+      var v = json.decode(res.body);
+      imageUrl = v['message'];
+      notifyListeners();
+      // setState(() {
+      //   imageUrl = v['message'];
+      // });
+    }
   }
+
+  // newDogPlease() {
+  //   notifyListeners();
+  // }
 }
 
 class MyApp extends StatelessWidget {
@@ -61,7 +76,7 @@ class BodyLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-        create: (context) => MyModel(),
+        create: (context) => MyDogModel(),
         builder: (context, child) {
           return Column(
             children: [
@@ -176,12 +191,25 @@ class _JobsWidgetPuzzleState extends State<JobsWidgetPuzzle> {
         ),
         RaisedButton(
           onPressed: () {
-            Provider.of<MyModel>(context, listen: false).newDogPlease();
-            // Disabled using a Consumer because we don't want to build anything,
-            // we instead want to trigger Dog fetchData() which in turn
-            // will trigger the build once the data has arrived.
-            // The question is whether provider allows a receiver of the notifyall
-            // to be a regular method somewhere? NO
+            /// Initial (wrong) thought was to call a method on the model here,
+            /// which would then somehow trigger the fetchData() function in
+            /// the image rendering widget, which would await and then set its
+            /// state with the new dog url, which would trigger image build().
+            ///
+            /// Turns out this is wrong because with provider you cannot have
+            /// a mere method or function being a consumer/listener - the
+            /// Consumer must be part of the widget build. Provider is a pattern
+            /// about widgets consuming model notifications, not about arbitrary
+            /// listener functions being notified.
+            ///
+            /// Plus the deeper problem was that in the above abandoned wrong
+            /// approach the model was doing nothing and the widget was doing
+            /// fetching and building. The model needed to do more - the fetching
+            /// and the widget is the UI responding to the model change - perfect.
+
+            /// Update: now use model properly - do the fetching in the model
+            /// then notify the gui
+            Provider.of<MyDogModel>(context, listen: false).fetchData();
 
             // Alternatively we might need a futurebuilder where the image
             // gets build once the http call has been received, as represented
@@ -190,17 +218,13 @@ class _JobsWidgetPuzzleState extends State<JobsWidgetPuzzle> {
             // Then again the initial implementation has the method await on
             // the http call then set state, which triggers the build - sounds
             // like an alternative to future builder!? ;-)
-
-            /// AHA what about putting the fetching of the jobs in the model
-            /// then when the jobs arrive, we notifylisteners.  this sounds
-            /// sensible!
-
           },
           child: Text('Fetch Dog picture'),
         ),
-        // Consumer<MyModel>(
-        //     builder: (context, myModel, child) => HttpRequestDogDemo()),
-        HttpRequestDogDemo(),
+        // HttpRequestDogDemo(),
+        Consumer<MyDogModel>(
+            builder: (context, myDogModel, child) =>
+                HttpRequestDogDemo2(myDogModel.imageUrl)),
       ],
     );
   }
@@ -309,5 +333,26 @@ class _HttpRequestDogDemoState extends State<HttpRequestDogDemo> {
         imageUrl = v['message'];
       });
     }
+  }
+}
+
+// Fetching Dog pictures v2. - using a model, which allows my
+// fetch button to be a separate widget. It also leverages provider model pattern
+
+class HttpRequestDogDemo2 extends StatelessWidget {
+  final String imageUrl;
+  HttpRequestDogDemo2(this.imageUrl);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        color: Colors.amber,
+        child: Center(
+          child: Image.network(
+            imageUrl,
+            height: MediaQuery.of(context).size.height / 6,
+            width: MediaQuery.of(context).size.width / 6,
+          ),
+        ));
   }
 }
