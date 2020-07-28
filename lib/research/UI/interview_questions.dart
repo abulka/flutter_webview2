@@ -14,12 +14,14 @@ void main() {
 }
 
 class MyModel extends ChangeNotifier {
-  List buttonLabels = ['Do A', 'Do B', 'Do C', 'Do D'];
+  // NOT USED YET IN THESE EXAMPLES
 
-  void add(String label) {
-    buttonLabels.add(label);
-    notifyListeners();
-  }
+  // List buttonLabels = ['Do A', 'Do B', 'Do C', 'Do D'];
+
+  // void add(String label) {
+  //   buttonLabels.add(label);
+  //   notifyListeners();
+  // }
 }
 
 class MyApp extends StatelessWidget {
@@ -48,22 +50,9 @@ class BodyLayout extends StatelessWidget {
         builder: (context, child) {
           return Column(
             children: [
-              // MyTextWidget(),
-              // MyTextWidget(
-              //   kind: Kind.fittedBox,
-              // ),
-              // MyTextWidget(
-              //   kind: Kind.fittedBoxNoRowOrIcons,
-              // ),
-              // MyTextWidget(
-              //   kind: Kind.expanded,
-              // ),
-              // MyTextWidget(
-              //   kind: Kind.expandedFittedBox,
-              // ),
-              // NestedScaffolds(),
-              // UsingKeysPuzzle(),
-              JobsWidgetPuzzle(),
+              ...buildSomeTextWidgets(),
+              NestedScaffolds(),
+              UsingKeysPuzzle(),
             ],
           );
         });
@@ -132,6 +121,26 @@ class MyTextWidget extends StatelessWidget {
     ]);
   }
 }
+
+List<Widget> buildSomeTextWidgets() {
+  return [
+    MyTextWidget(),
+    MyTextWidget(
+      kind: Kind.fittedBox,
+    ),
+    MyTextWidget(
+      kind: Kind.fittedBoxNoRowOrIcons,
+    ),
+    MyTextWidget(
+      kind: Kind.expanded,
+    ),
+    MyTextWidget(
+      kind: Kind.expandedFittedBox,
+    ),
+  ];
+}
+
+// Nested Scaffold Questions
 
 class NestedScaffolds extends StatelessWidget {
   const NestedScaffolds({Key key}) : super(key: key);
@@ -306,111 +315,4 @@ class _CounterButtonState extends State<CounterButton> {
       },
     );
   }
-}
-
-// GitHub jobs puzzle
-// https://www.raywenderlich.com/10971345-flutter-interview-questions-and-answers#toc-anchor-015
-
-class Job {
-  final String company;
-  final String title;
-  Job({this.company, this.title});
-
-  // factory Job.fromJson(Map<String, dynamic> json) {
-  //   return Job(
-  //     company: json['company'],
-  //     title: json['title'],
-  //   );
-  // }
-
-  Job.fromJson(Map<String, dynamic> json)
-      : company = json['company'],
-        title = json['title'];
-}
-
-class JobsWidgetPuzzle extends StatefulWidget {
-  @override
-  _JobsWidgetPuzzleState createState() => _JobsWidgetPuzzleState();
-}
-
-class _JobsWidgetPuzzleState extends State<JobsWidgetPuzzle> {
-  // Future<Job> futureJob;
-  Future<List<Job>> futureJobs;
-
-  @override
-  void initState() {
-    super.initState();
-    // futureJob = fetchJob();
-    futureJobs = fetchJobs();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Divider(
-          color: Colors.green,
-          thickness: 2,
-        ),
-        RaisedButton(
-          onPressed: () {
-            print('fetchJobs().then');
-            fetchJobs().then((result) {
-              // print('fetchJobs().then, result = $result');
-              print('fetchJobs().then, ${result.map((job) => job.title)}');
-            });
-          },
-          child: Text('fetchJobs().then()'),
-        ),
-        RaisedButton(
-          onPressed: () async {
-            print('fetchJobs() async await');
-            var result = await fetchJobs();
-            print('In await, result = ${result.map((job) => job.title)}');
-          },
-          child: Text('fetchJobs() async await'),
-        )
-      ],
-    );
-  }
-}
-
-// Future<http.Response> fetchAlbum() {
-//   return http.get('https://jobs.github.com/positions.json?location=remote');
-// }
-
-//   Future<Job> fetchJob() async {
-//     print('fetchJob begins....');
-//     final response = await http
-//         .get('https://jobs.github.com/positions.json?location=remote');
-//     print('response.statusCode = ${response.statusCode}');
-//     if (response.statusCode == 200) {
-//       // If the server did return a 200 OK response,
-//       // then parse the JSON.
-//       return Job.fromJson(json.decode(response.body));
-//     } else {
-//       // If the server did not return a 200 OK response,
-//       // then throw an exception.
-//       throw Exception('Failed to load jobs');
-//     }
-//   }
-// }
-
-Future<List<Job>> fetchJobs() async {
-  // THIS MORE COMPLEX INVOCATION WORKS OK TOO
-  // print('fetchJobs()');
-  // final host = 'jobs.github.com';
-  // final path = 'positions.json';
-  // final queryParameters = {'location': 'remote'};
-  // final headers = {'Accept': 'application/json'};
-  // final uri = Uri.https(host, path, queryParameters);
-  // final results = await http.get(uri, headers: headers);
-
-  final results = await http
-        .get('https://jobs.github.com/positions.json?location=remote');
-  print(
-      'fetchJobs() result after await, status = ${results.statusCode}');
-  final jsonList = json.decode(results.body) as List;
-  // print('fetchJobs() jsonList = $jsonList');
-  return jsonList.map((job) => Job.fromJson(job)).toList();
 }
