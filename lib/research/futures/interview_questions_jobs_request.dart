@@ -86,7 +86,7 @@ class MyApp extends StatelessWidget {
       home: Scaffold(
         appBar: AppBar(
             title: Text(
-                'Interview Questions - Jobs and Dogs from Internet via Futures')),
+                'Interview Questions - Jobs and Dogs from Internet via Futures.')),
         body: BodyLayout(),
       ),
     );
@@ -194,7 +194,8 @@ class JobsButtons extends StatelessWidget {
               print('fetchJobs().then, ${result.map((job) => job.title)}');
             });
           },
-          child: Text('fetchJobs().then()'),
+          child: Text('fetchJobs().then()',
+              style: TextStyle(fontSize: 10, fontWeight: FontWeight.normal)),
         ),
         RaisedButton(
           onPressed: () async {
@@ -202,7 +203,10 @@ class JobsButtons extends StatelessWidget {
             var result = await fetchJobs();
             print('In await, result = ${result.map((job) => job.title)}');
           },
-          child: Text('fetchJobs() async await'),
+          child: Text(
+            'fetchJobs() async await',
+            style: TextStyle(fontSize: 10, fontWeight: FontWeight.normal),
+          ),
         ),
         RaisedButton(
           onPressed: () async {
@@ -210,7 +214,7 @@ class JobsButtons extends StatelessWidget {
             Provider.of<MyJobsModel>(context, listen: false).fetchData();
           },
           color: Colors.amber,
-          child: Text('fetchJobs() via model'),
+          child: Text('fetchJobs() via model', style: TextStyle(fontSize: 10)),
         ),
       ],
     );
@@ -301,7 +305,7 @@ class DogsArea extends StatelessWidget {
       children: [
         Column(
           children: [
-            Text('v1. (widget does fetch and await)'),
+            Text('v1. (widget fetches)'),
             HttpRequestDogDemo(),
           ],
         ),
