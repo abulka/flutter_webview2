@@ -46,7 +46,40 @@ class MyDogModel extends ChangeNotifier {
 }
 
 class MyJobsModel extends ChangeNotifier {
-  List<Job> jobs; // interesting we don't have to declare this Future<List<Job>>
+  List<Job> jobs = []; // interesting we don't have to declare this Future<List<Job>>
+  // final List<String> notes = [
+  //   "fluttermaster.com",
+  //   "Update Android Studio to 3.3",
+  //   "Implement ListView widget",
+  //   "Demo ListView simplenote app",
+  //   "Fixing app color",
+  //   "Create new note screen",
+  //   "Persist notes data",
+  //   "Add screen transition animation",
+  //   "Something long Something long Something long Something long Something long Something long",
+  //   "2 fluttermaster.com",
+  //   "2a fluttermaster.com",
+  //   "2 Update Android Studio to 3.3",
+  //   "2a Update Android Studio to 3.3",
+  //   "2 Implement ListView widget",
+  //   "2a Implement ListView widget",
+  //   "2 Demo ListView simplenote app",
+  //   "2a Demo ListView simplenote app",
+  //   "2 Fixing app color",
+  //   "2a Fixing app color",
+  //   "2 Create new note screen",
+  //   "2a Create new note screen",
+  //   "2 Persist notes data",
+  //   "2a Persist notes data",
+  //   "2 Add screen transition animation",
+  //   "2a Add screen transition animation",
+  //   "2 Something long Something long Something long Something long Something long Something long",
+  //   "2a Something long Something long Something long Something long Something long Something long",
+  //   // ].map((el) => el + '--' * 20 + el * 12).toList();
+  // ];
+
+  // // TODO need to initialise jobs with dummy values from 'note' var
+
   fetchData() async {
     jobs = await fetchJobs();
     print('After MyJobsModel await, result = ${jobs.map((job) => job.title)}');
@@ -157,49 +190,129 @@ class InfoTextArea extends StatelessWidget {
 }
 
 class JobsArea extends StatelessWidget {
-  const JobsArea({
-    Key key,
-  }) : super(key: key);
+  final MyJobsModel myJobsModel;
+  const JobsArea({Key key, this.myJobsModel}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            RaisedButton(
-              onPressed: () {
-                print('fetchJobs().then');
-                fetchJobs().then((result) {
-                  // print('fetchJobs().then, result = $result');
-                  print('fetchJobs().then, ${result.map((job) => job.title)}');
-                });
-              },
-              child: Text('fetchJobs().then()'),
-            ),
-            RaisedButton(
-              onPressed: () async {
-                print('fetchJobs() async await');
-                var result = await fetchJobs();
-                print('In await, result = ${result.map((job) => job.title)}');
-              },
-              child: Text('fetchJobs() async await'),
-            ),
-            RaisedButton(
-              onPressed: () async {
-                print('fetchJobs() via model');
-                Provider.of<MyJobsModel>(context, listen: false).fetchData();
-              },
-              child: Text('fetchJobs() via model'),
-            ),
-          ],
-        ),
-        JobsListView(),
+        JobsButtons(),
+        // JobsListView(),
+        Consumer<MyJobsModel>(
+            builder: (context, myJobsModel, child) =>
+                JobsListView(myJobsModel: myJobsModel)),
       ],
     );
   }
 }
+
+class JobsButtons extends StatelessWidget {
+  const JobsButtons({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        RaisedButton(
+          onPressed: () {
+            print('fetchJobs().then');
+            fetchJobs().then((result) {
+              // print('fetchJobs().then, result = $result');
+              print('fetchJobs().then, ${result.map((job) => job.title)}');
+            });
+          },
+          child: Text('fetchJobs().then()'),
+        ),
+        RaisedButton(
+          onPressed: () async {
+            print('fetchJobs() async await');
+            var result = await fetchJobs();
+            print('In await, result = ${result.map((job) => job.title)}');
+          },
+          child: Text('fetchJobs() async await'),
+        ),
+        RaisedButton(
+          onPressed: () async {
+            print('fetchJobs() via model');
+            Provider.of<MyJobsModel>(context, listen: false).fetchData();
+          },
+          color: Colors.amber,
+          child: Text('fetchJobs() via model'),
+        ),
+      ],
+    );
+  }
+}
+
+class JobsListView extends StatelessWidget {
+  final MyJobsModel myJobsModel;
+  const JobsListView({Key key, this.myJobsModel}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    // Had to wrap listview in expanded so that it sized itself out.  But also
+    // had to wrap this entire widget with expanded again, so the WIDGET itself
+    // expanded itself out!
+    return Expanded(
+      child: ListView.builder(
+          // shrinkWrap: true,
+          itemCount: myJobsModel.jobs.length,
+          itemBuilder: (context, idx) {
+            return Text(myJobsModel.jobs[idx].title);
+          }),
+    );
+
+    // return Text(notes[2]);
+  }
+}
+
+// Future<http.Response> fetchAlbum() {
+//   return http.get('https://jobs.github.com/positions.json?location=remote');
+// }
+
+//   Future<Job> fetchJob() async {
+//     print('fetchJob begins....');
+//     final response = await http
+//         .get('https://jobs.github.com/positions.json?location=remote');
+//     print('response.statusCode = ${response.statusCode}');
+//     if (response.statusCode == 200) {
+//       // If the server did return a 200 OK response,
+//       // then parse the JSON.
+//       return Job.fromJson(json.decode(response.body));
+//     } else {
+//       // If the server did not return a 200 OK response,
+//       // then throw an exception.
+//       throw Exception('Failed to load jobs');
+//     }
+//   }
+// }
+
+Future<List<Job>> fetchJobs() async {
+  // THIS MORE COMPLEX INVOCATION WORKS OK TOO
+  final host = 'jobs.github.com';
+  final path = 'positions.json';
+  final queryParameters = {'location': 'remote'};
+  final headers = {'Accept': 'application/json'};
+  final uri = Uri.https(host, path, queryParameters);
+  print('fetchJobs() async function being called... $uri');
+  final results = await http.get(uri, headers: headers);
+
+  // SIMPLER INVOCATION
+  // final results =
+  //     await http.get('https://jobs.github.com/positions.json?location=remote');
+
+  print('fetchJobs() result after await, status = ${results.statusCode}');
+  final jsonList = json.decode(results.body) as List;
+  // print('fetchJobs() jsonList = $jsonList');
+  return jsonList.map((job) => Job.fromJson(job)).toList();
+}
+
+// Fetching Dog pictures
+// https://stackoverflow.com/questions/58557173/how-to-make-http-request-work-in-flutter-web
 
 class DogsArea extends StatelessWidget {
   const DogsArea({
@@ -261,100 +374,6 @@ class DogsArea extends StatelessWidget {
     );
   }
 }
-
-class JobsListView extends StatelessWidget {
-  final List<String> notes = [
-    "fluttermaster.com",
-    "Update Android Studio to 3.3",
-    "Implement ListView widget",
-    "Demo ListView simplenote app",
-    "Fixing app color",
-    "Create new note screen",
-    "Persist notes data",
-    "Add screen transition animation",
-    "Something long Something long Something long Something long Something long Something long",
-    "2 fluttermaster.com",
-    "2a fluttermaster.com",
-    "2 Update Android Studio to 3.3",
-    "2a Update Android Studio to 3.3",
-    "2 Implement ListView widget",
-    "2a Implement ListView widget",
-    "2 Demo ListView simplenote app",
-    "2a Demo ListView simplenote app",
-    "2 Fixing app color",
-    "2a Fixing app color",
-    "2 Create new note screen",
-    "2a Create new note screen",
-    "2 Persist notes data",
-    "2a Persist notes data",
-    "2 Add screen transition animation",
-    "2a Add screen transition animation",
-    "2 Something long Something long Something long Something long Something long Something long",
-    "2a Something long Something long Something long Something long Something long Something long",
-  // ].map((el) => el + '--' * 20 + el * 12).toList();
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    // Had to wrap listview in expanded so that it sized itself out.  But also
-    // had to wrap this entire widget with expanded again, so the WIDGET itself
-    // expanded itself out!
-    return Expanded(
-      child: ListView.builder(
-          // shrinkWrap: true,
-          itemCount: notes.length,
-          itemBuilder: (context, idx) {
-            return Text(notes[idx]);
-          }),
-    );
-
-    // return Text(notes[2]);
-  }
-}
-
-// Future<http.Response> fetchAlbum() {
-//   return http.get('https://jobs.github.com/positions.json?location=remote');
-// }
-
-//   Future<Job> fetchJob() async {
-//     print('fetchJob begins....');
-//     final response = await http
-//         .get('https://jobs.github.com/positions.json?location=remote');
-//     print('response.statusCode = ${response.statusCode}');
-//     if (response.statusCode == 200) {
-//       // If the server did return a 200 OK response,
-//       // then parse the JSON.
-//       return Job.fromJson(json.decode(response.body));
-//     } else {
-//       // If the server did not return a 200 OK response,
-//       // then throw an exception.
-//       throw Exception('Failed to load jobs');
-//     }
-//   }
-// }
-
-Future<List<Job>> fetchJobs() async {
-  // THIS MORE COMPLEX INVOCATION WORKS OK TOO
-  final host = 'jobs.github.com';
-  final path = 'positions.json';
-  final queryParameters = {'location': 'remote'};
-  final headers = {'Accept': 'application/json'};
-  final uri = Uri.https(host, path, queryParameters);
-  print('fetchJobs() async function being called... $uri');
-  final results = await http.get(uri, headers: headers);
-
-  // SIMPLER INVOCATION
-  // final results =
-  //     await http.get('https://jobs.github.com/positions.json?location=remote');
-
-  print('fetchJobs() result after await, status = ${results.statusCode}');
-  final jsonList = json.decode(results.body) as List;
-  // print('fetchJobs() jsonList = $jsonList');
-  return jsonList.map((job) => Job.fromJson(job)).toList();
-}
-
-// Fetching Dog pictures
-// https://stackoverflow.com/questions/58557173/how-to-make-http-request-work-in-flutter-web
 
 class HttpRequestDogDemo extends StatefulWidget {
   @override
