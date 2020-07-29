@@ -46,39 +46,8 @@ class MyDogModel extends ChangeNotifier {
 }
 
 class MyJobsModel extends ChangeNotifier {
-  List<Job> jobs = []; // interesting we don't have to declare this Future<List<Job>>
-  // final List<String> notes = [
-  //   "fluttermaster.com",
-  //   "Update Android Studio to 3.3",
-  //   "Implement ListView widget",
-  //   "Demo ListView simplenote app",
-  //   "Fixing app color",
-  //   "Create new note screen",
-  //   "Persist notes data",
-  //   "Add screen transition animation",
-  //   "Something long Something long Something long Something long Something long Something long",
-  //   "2 fluttermaster.com",
-  //   "2a fluttermaster.com",
-  //   "2 Update Android Studio to 3.3",
-  //   "2a Update Android Studio to 3.3",
-  //   "2 Implement ListView widget",
-  //   "2a Implement ListView widget",
-  //   "2 Demo ListView simplenote app",
-  //   "2a Demo ListView simplenote app",
-  //   "2 Fixing app color",
-  //   "2a Fixing app color",
-  //   "2 Create new note screen",
-  //   "2a Create new note screen",
-  //   "2 Persist notes data",
-  //   "2a Persist notes data",
-  //   "2 Add screen transition animation",
-  //   "2a Add screen transition animation",
-  //   "2 Something long Something long Something long Something long Something long Something long",
-  //   "2a Something long Something long Something long Something long Something long Something long",
-  //   // ].map((el) => el + '--' * 20 + el * 12).toList();
-  // ];
-
-  // // TODO need to initialise jobs with dummy values from 'note' var
+  List<Job> jobs =
+      []; // interesting we don't have to declare this Future<List<Job>>
 
   fetchData() async {
     jobs = await fetchJobs();
@@ -270,6 +239,10 @@ class JobsListView extends StatelessWidget {
   }
 }
 
+//
+// Console only outputs - getting jobs - not via model
+//
+
 // Future<http.Response> fetchAlbum() {
 //   return http.get('https://jobs.github.com/positions.json?location=remote');
 // }
@@ -311,8 +284,10 @@ Future<List<Job>> fetchJobs() async {
   return jsonList.map((job) => Job.fromJson(job)).toList();
 }
 
+//
 // Fetching Dog pictures
 // https://stackoverflow.com/questions/58557173/how-to-make-http-request-work-in-flutter-web
+//
 
 class DogsArea extends StatelessWidget {
   const DogsArea({
