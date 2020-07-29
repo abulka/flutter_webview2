@@ -181,6 +181,7 @@ class _JobsWidgetPuzzleState extends State<JobsWidgetPuzzle> {
         ),
 
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             RaisedButton(
               onPressed: () {
@@ -209,48 +210,107 @@ class _JobsWidgetPuzzleState extends State<JobsWidgetPuzzle> {
             ),
           ],
         ),
+        JobsListView(),
         Divider(
           color: Colors.green[200],
           thickness: 2,
         ),
-        RaisedButton(
-          onPressed: () {
-            /// Initial (wrong) thought was to call a method on the model here,
-            /// which would then somehow trigger the fetchData() function in
-            /// the image rendering widget, which would await and then set its
-            /// state with the new dog url, which would trigger image build().
-            ///
-            /// Turns out this is wrong because with provider you cannot have
-            /// a mere method or function being a consumer/listener - the
-            /// Consumer must be part of the widget build. Provider is a pattern
-            /// about widgets consuming model notifications, not about arbitrary
-            /// listener functions being notified.
-            ///
-            /// Plus the deeper problem was that in the above abandoned wrong
-            /// approach the model was doing nothing and the widget was doing
-            /// fetching and building. The model needed to do more - the fetching
-            /// and the widget is the UI responding to the model change - perfect.
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Column(
+              children: [
+                Text('v1. (widget does fetch and await)'),
+                HttpRequestDogDemo(),
+              ],
+            ),
+            Column(
+              children: [
+                Text('v2 (model, button is sep. widget).'),
+                Consumer<MyDogModel>(
+                    builder: (context, myDogModel, child) =>
+                        HttpRequestDogDemo2(myDogModel.imageUrl)),
+                RaisedButton(
+                  onPressed: () {
+                    /// Initial (wrong) thought was to call a method on the model here,
+                    /// which would then somehow trigger the fetchData() function in
+                    /// the image rendering widget, which would await and then set its
+                    /// state with the new dog url, which would trigger image build().
+                    ///
+                    /// Turns out this is wrong because with provider you cannot have
+                    /// a mere method or function being a consumer/listener - the
+                    /// Consumer must be part of the widget build. Provider is a pattern
+                    /// about widgets consuming model notifications, not about arbitrary
+                    /// listener functions being notified.
+                    ///
+                    /// Plus the deeper problem was that in the above abandoned wrong
+                    /// approach the model was doing nothing and the widget was doing
+                    /// fetching and building. The model needed to do more - the fetching
+                    /// and the widget is the UI responding to the model change - perfect.
 
-            /// Update: now use model properly - do the fetching in the model
-            /// then notify the gui
-            Provider.of<MyDogModel>(context, listen: false).fetchData();
+                    /// Update: now use model properly - do the fetching in the model
+                    /// then notify the gui
+                    Provider.of<MyDogModel>(context, listen: false).fetchData();
 
-            // Alternatively we might need a futurebuilder where the image
-            // gets build once the http call has been received, as represented
-            // as a future.
-            //
-            // Then again the initial implementation has the method await on
-            // the http call then set state, which triggers the build - sounds
-            // like an alternative to future builder!? ;-)
-          },
-          child: Text('Fetch Dog picture'),
+                    // Alternatively we might need a futurebuilder where the image
+                    // gets build once the http call has been received, as represented
+                    // as a future.
+                    //
+                    // Then again the initial implementation has the method await on
+                    // the http call then set state, which triggers the build - sounds
+                    // like an alternative to future builder!? ;-)
+                  },
+                  child: Text('Fetch Dog picture'),
+                ),
+              ],
+            )
+          ],
         ),
-        // HttpRequestDogDemo(),
-        Consumer<MyDogModel>(
-            builder: (context, myDogModel, child) =>
-                HttpRequestDogDemo2(myDogModel.imageUrl)),
+        Container(
+          color: Colors.green,
+          height: 10,
+        ),
       ],
     );
+  }
+}
+
+class JobsListView extends StatelessWidget {
+  final List<String> notes = [
+    "fluttermaster.com",
+    "Update Android Studio to 3.3",
+    "Implement ListView widget",
+    "Demo ListView simplenote app",
+    "Fixing app color",
+    "Create new note screen",
+    "Persist notes data",
+    "Add screen transition animation",
+    "Something long Something long Something long Something long Something long Something long",
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    //TODO build ListView here
+    // Expanded(child: ListView(children: [
+    //   itemC
+    //   Container(
+    //     height: 50,
+    //     color: Colors.amber[500],
+    //     child: const Center(child: Text('Entry A')),
+    //   ),
+    //   Container(
+    //     height: 50,
+    //     color: Colors.amber[500],
+    //     child: const Center(child: Text('Entry B')),
+    //   ),
+    // ],),),
+    return ListView.builder(
+        // shrinkWrap: true,
+        itemCount: notes.length,
+        itemBuilder: (context, idx) {
+          return Text(notes[idx]);
+        });
+    // return Text(notes[2]);
   }
 }
 
@@ -334,8 +394,8 @@ class _HttpRequestDogDemoState extends State<HttpRequestDogDemo> {
         Center(
           child: Image.network(
             imageUrl,
-            height: MediaQuery.of(context).size.height / 6,
-            width: MediaQuery.of(context).size.width / 6,
+            height: MediaQuery.of(context).size.height / 4,
+            width: MediaQuery.of(context).size.width / 4,
           ),
         ),
         FloatingActionButton(
@@ -369,14 +429,12 @@ class HttpRequestDogDemo2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        color: Colors.amber,
-        child: Center(
-          child: Image.network(
-            imageUrl,
-            height: MediaQuery.of(context).size.height / 4,
-            width: MediaQuery.of(context).size.width / 4,
-          ),
-        ));
+    return Center(
+      child: Image.network(
+        imageUrl,
+        height: MediaQuery.of(context).size.height / 4,
+        width: MediaQuery.of(context).size.width / 4,
+      ),
+    );
   }
 }
