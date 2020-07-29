@@ -54,72 +54,6 @@ class MyJobsModel extends ChangeNotifier {
   }
 }
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Dynamic Experiments',
-      theme: ThemeData(
-        primarySwatch: Colors.teal,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: Scaffold(
-        appBar: AppBar(
-            title:
-                Text('Interview Questions - Jobs from Internet via Futures')),
-        body: BodyLayout(),
-      ),
-    );
-  }
-}
-
-class BodyLayout extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MultiProvider(
-        providers: [
-          ChangeNotifierProvider<MyDogModel>(create: (context) => MyDogModel()),
-          ChangeNotifierProvider<MyJobsModel>(
-              create: (context) => MyJobsModel()),
-        ],
-        // ChangeNotifierProvider(
-        //   create: (context) => MyDogModel(),
-        builder: (context, child) {
-          return Column(
-            children: [
-              // Why does this wrap nicely? Whereas previously (in the interview
-              // question puzzle) we had to add the Expanded() widget. But if we
-              // add Expanded() here, it pushes the text area to be HUGE and
-              // taking up most of the screen!
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Text(dedent('''
-                      Fetching Jobs only works in an emulator - not in chrome browser. 
-                      Because "access-control-allow-origin: *" is not the header 
-                      coming back from the Jobs server.
-                      https://jobs.github.com/positions.json?location=remote
-                      
-                      AAA aasdassd das adss  lsdkjf lsdkjf lsdkjf lskdjf lskdjf lskdjflksd jflksdj flksdj flksdjf lksdjf lskdjf lksd sldkfjsdlkfj lsdkjf lskdjf lksdjf lskdjf l ldskjf lsdkjf lskdfj lskdfj lsdkjf
-
-                      However this endpoint 
-                      https://dog.ceo/api/breeds/image/random (API doco: https://dog.ceo/dog-api/documentation/random)
-                      does return "access-control-allow-origin: *" in the header (yay)
-                      So fetching dog pictures should work in chrome.
-                      ''')),
-                ),
-              ),
-
-              JobsWidgetPuzzle(),
-            ],
-          );
-        });
-  }
-}
-
-// GitHub jobs puzzle
-// https://www.raywenderlich.com/10971345-flutter-interview-questions-and-answers#toc-anchor-015
-
 class Job {
   final String company;
   final String title;
@@ -137,49 +71,100 @@ class Job {
         title = json['title'];
 }
 
-class JobsWidgetPuzzle extends StatefulWidget {
+class MyApp extends StatelessWidget {
+  // This widget is the root of your application.
   @override
-  _JobsWidgetPuzzleState createState() => _JobsWidgetPuzzleState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Dynamic Experiments',
+      theme: ThemeData(
+        primarySwatch: Colors.teal,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: Scaffold(
+        appBar: AppBar(
+            title: Text(
+                'Interview Questions - Jobs and Dogs from Internet via Futures')),
+        body: BodyLayout(),
+      ),
+    );
+  }
 }
 
-class _JobsWidgetPuzzleState extends State<JobsWidgetPuzzle> {
-  // Future<Job> futureJob;
-  Future<List<Job>> futureJobs;
+class BodyLayout extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider<MyDogModel>(create: (context) => MyDogModel()),
+          ChangeNotifierProvider<MyJobsModel>(
+              create: (context) => MyJobsModel()),
+        ],
+        builder: (context, child) {
+          return Page();
+        });
+  }
+}
+
+class Page extends StatelessWidget {
+  const Page({Key key}) : super(key: key);
 
   @override
-  void initState() {
-    super.initState();
-    // futureJob = fetchJob();
-    // futureJobs = fetchJobs();
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          Expanded(
+            child: InfoTextArea(),
+          ),
+          Divider(
+            color: Colors.green,
+            thickness: 2,
+          ),
+          Expanded(flex: 3, child: JobsArea()),
+          Divider(
+            color: Colors.green[200],
+            thickness: 2,
+          ),
+          // Dogs area doesn't seem to need expanded, since it is a row which
+          // is the size it is, based on the images
+          DogsArea(),
+        ],
+      ),
+    );
   }
+}
+
+class InfoTextArea extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Text(dedent('''
+          Fetching Jobs only works in an emulator - not in chrome browser. 
+          Because "access-control-allow-origin: *" is not the header 
+          coming back from the Jobs server.
+          https://jobs.github.com/positions.json?location=remote
+          
+          AAA aasdassd das adss  lsdkjf lsdkjf lsdkjf lskdjf lskdjf lskdjflksd jflksdj flksdj flksdjf lksdjf lskdjf lksd sldkfjsdlkfj lsdkjf lskdjf lksdjf lskdjf l ldskjf lsdkjf lskdfj lskdfj lsdkjf
+
+          However this endpoint 
+          https://dog.ceo/api/breeds/image/random (API doco: https://dog.ceo/dog-api/documentation/random)
+          does return "access-control-allow-origin: *" in the header (yay)
+          So fetching dog pictures should work in chrome.
+          ''')),
+    );
+  }
+}
+
+class JobsArea extends StatelessWidget {
+  const JobsArea({
+    Key key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        /// Adding any Expanded Text stuff here breaks the layout completely.
-        /// I think this is because  we are a column in a column? Adding the text
-        /// one layer up works better.
-        //
-        // Expanded(
-        //   child: FittedBox(
-        //       child: Text(
-        //           'This only works in an emulator - not in chrome browser')),
-        // ),
-        // Flexible(child: FittedBox(child: Text('aasdassd das adss'))),
-        // Flexible(child: Text('aasdassd das adss')),
-        // FittedBox(child: Text('aasdassd das adss  lsdkjf lsdkjf lsdkjf lskdjf lskdjf lskdjflksd jflksdj flksdj flksdjf lksdjf lskdjf lksd sldkfjsdlkfj lsdkjf lskdjf lksdjf lskdjf l ldskjf lsdkjf lskdfj lskdfj lsdkjf')),
-        // Expanded(child: Text('aasdassd das adss  lsdkjf lsdkjf lsdkjf lskdjf lskdjf lskdjflksd jflksdj flksdj flksdjf lksdjf lskdjf lksd sldkfjsdlkfj lsdkjf lskdjf lksdjf lskdjf l ldskjf lsdkjf lskdfj lskdfj lsdkjf')),
-        // SizedBox(
-        //     height: 50,
-        //     child:
-        //         Text('This only works in an emulator - not in chrome browser')),
-
-        Divider(
-          color: Colors.green,
-          thickness: 2,
-        ),
-
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -211,65 +196,67 @@ class _JobsWidgetPuzzleState extends State<JobsWidgetPuzzle> {
           ],
         ),
         JobsListView(),
-        Divider(
-          color: Colors.green[200],
-          thickness: 2,
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      ],
+    );
+  }
+}
+
+class DogsArea extends StatelessWidget {
+  const DogsArea({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Column(
           children: [
-            Column(
-              children: [
-                Text('v1. (widget does fetch and await)'),
-                HttpRequestDogDemo(),
-              ],
-            ),
-            Column(
-              children: [
-                Text('v2 (model, button is sep. widget).'),
-                Consumer<MyDogModel>(
-                    builder: (context, myDogModel, child) =>
-                        HttpRequestDogDemo2(myDogModel.imageUrl)),
-                RaisedButton(
-                  onPressed: () {
-                    /// Initial (wrong) thought was to call a method on the model here,
-                    /// which would then somehow trigger the fetchData() function in
-                    /// the image rendering widget, which would await and then set its
-                    /// state with the new dog url, which would trigger image build().
-                    ///
-                    /// Turns out this is wrong because with provider you cannot have
-                    /// a mere method or function being a consumer/listener - the
-                    /// Consumer must be part of the widget build. Provider is a pattern
-                    /// about widgets consuming model notifications, not about arbitrary
-                    /// listener functions being notified.
-                    ///
-                    /// Plus the deeper problem was that in the above abandoned wrong
-                    /// approach the model was doing nothing and the widget was doing
-                    /// fetching and building. The model needed to do more - the fetching
-                    /// and the widget is the UI responding to the model change - perfect.
-
-                    /// Update: now use model properly - do the fetching in the model
-                    /// then notify the gui
-                    Provider.of<MyDogModel>(context, listen: false).fetchData();
-
-                    // Alternatively we might need a futurebuilder where the image
-                    // gets build once the http call has been received, as represented
-                    // as a future.
-                    //
-                    // Then again the initial implementation has the method await on
-                    // the http call then set state, which triggers the build - sounds
-                    // like an alternative to future builder!? ;-)
-                  },
-                  child: Text('Fetch Dog picture'),
-                ),
-              ],
-            )
+            Text('v1. (widget does fetch and await)'),
+            HttpRequestDogDemo(),
           ],
         ),
-        Container(
-          color: Colors.green,
-          height: 10,
-        ),
+        Column(
+          children: [
+            Text('v2 (model, button is sep. widget).'),
+            Consumer<MyDogModel>(
+                builder: (context, myDogModel, child) =>
+                    HttpRequestDogDemo2(myDogModel.imageUrl)),
+            RaisedButton(
+              onPressed: () {
+                /// Initial (wrong) thought was to call a method on the model here,
+                /// which would then somehow trigger the fetchData() function in
+                /// the image rendering widget, which would await and then set its
+                /// state with the new dog url, which would trigger image build().
+                ///
+                /// Turns out this is wrong because with provider you cannot have
+                /// a mere method or function being a consumer/listener - the
+                /// Consumer must be part of the widget build. Provider is a pattern
+                /// about widgets consuming model notifications, not about arbitrary
+                /// listener functions being notified.
+                ///
+                /// Plus the deeper problem was that in the above abandoned wrong
+                /// approach the model was doing nothing and the widget was doing
+                /// fetching and building. The model needed to do more - the fetching
+                /// and the widget is the UI responding to the model change - perfect.
+
+                /// Update: now use model properly - do the fetching in the model
+                /// then notify the gui
+                Provider.of<MyDogModel>(context, listen: false).fetchData();
+
+                // Alternatively we might need a futurebuilder where the image
+                // gets build once the http call has been received, as represented
+                // as a future.
+                //
+                // Then again the initial implementation has the method await on
+                // the http call then set state, which triggers the build - sounds
+                // like an alternative to future builder!? ;-)
+              },
+              child: Text('Fetch Dog picture'),
+            ),
+          ],
+        )
       ],
     );
   }
@@ -286,30 +273,41 @@ class JobsListView extends StatelessWidget {
     "Persist notes data",
     "Add screen transition animation",
     "Something long Something long Something long Something long Something long Something long",
+    "2 fluttermaster.com",
+    "2a fluttermaster.com",
+    "2 Update Android Studio to 3.3",
+    "2a Update Android Studio to 3.3",
+    "2 Implement ListView widget",
+    "2a Implement ListView widget",
+    "2 Demo ListView simplenote app",
+    "2a Demo ListView simplenote app",
+    "2 Fixing app color",
+    "2a Fixing app color",
+    "2 Create new note screen",
+    "2a Create new note screen",
+    "2 Persist notes data",
+    "2a Persist notes data",
+    "2 Add screen transition animation",
+    "2a Add screen transition animation",
+    "2 Something long Something long Something long Something long Something long Something long",
+    "2a Something long Something long Something long Something long Something long Something long",
+  // ].map((el) => el + '--' * 20 + el * 12).toList();
   ];
 
   @override
   Widget build(BuildContext context) {
-    //TODO build ListView here
-    // Expanded(child: ListView(children: [
-    //   itemC
-    //   Container(
-    //     height: 50,
-    //     color: Colors.amber[500],
-    //     child: const Center(child: Text('Entry A')),
-    //   ),
-    //   Container(
-    //     height: 50,
-    //     color: Colors.amber[500],
-    //     child: const Center(child: Text('Entry B')),
-    //   ),
-    // ],),),
-    return ListView.builder(
-        // shrinkWrap: true,
-        itemCount: notes.length,
-        itemBuilder: (context, idx) {
-          return Text(notes[idx]);
-        });
+    // Had to wrap listview in expanded so that it sized itself out.  But also
+    // had to wrap this entire widget with expanded again, so the WIDGET itself
+    // expanded itself out!
+    return Expanded(
+      child: ListView.builder(
+          // shrinkWrap: true,
+          itemCount: notes.length,
+          itemBuilder: (context, idx) {
+            return Text(notes[idx]);
+          }),
+    );
+
     // return Text(notes[2]);
   }
 }
