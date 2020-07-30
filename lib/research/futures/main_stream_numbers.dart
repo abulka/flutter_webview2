@@ -13,10 +13,12 @@ class MyApp extends StatelessWidget {
     return new MaterialApp(
       home: Scaffold(
           appBar: AppBar(title: Text('Display Numbers stream in UI')),
-          body: NumbersDisplay()),
+          body: NumbersDisplay2()),
     );
   }
 }
+
+// Displays as we go...
 
 class NumbersDisplay extends StatefulWidget {
   NumbersDisplay({Key key}) : super(key: key);
@@ -55,5 +57,62 @@ class _NumbersDisplayState extends State<NumbersDisplay> {
         itemBuilder: (context, index) {
           return Text('got ${numbersReceived[index]}');
         });
+  }
+}
+
+// Displays once we get all the values using a future builder...
+
+class NumbersDisplay2 extends StatefulWidget {
+  NumbersDisplay2({Key key}) : super(key: key);
+
+  @override
+  _NumbersDisplay2State createState() => _NumbersDisplay2State();
+}
+
+class _NumbersDisplay2State extends State<NumbersDisplay2> {
+  Future<List<int>> numbersReceived;
+
+  @override
+  void initState() {
+    super.initState();
+    // numbersReceived = gatherNumbers();
+    numbersReceived = gatherNumbersIntoList(timedCounter(Duration(seconds: 1), 4));
+  }
+
+  Future<List<int>> gatherNumbers() async {
+    await Future.delayed(Duration(seconds: 2)); // wait 2 sec
+    return [42, 43, 55];
+  }
+
+  Future<List<int>> gatherNumbersIntoList(Stream<int> stream) async {
+    List<int> numbersReceived = [];
+    await for (var value in stream) {
+      numbersReceived.add(value);
+    }
+    return numbersReceived;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: _buildAll(),
+    );
+  }
+
+  _buildAll() {
+    return FutureBuilder<List<int>>(
+      future: numbersReceived,
+      builder: (BuildContext context, AsyncSnapshot<List<int>> snapshot) {
+        if (snapshot.hasData) {
+          return ListView.builder(
+              itemCount: snapshot.data.length,
+              itemBuilder: (context, index) {
+                return Text('got ${snapshot.data[index]}');
+              });
+        } else {
+          return Text('Waiting for all the numbers to arrive...');
+        }
+      },
+    );
   }
 }
