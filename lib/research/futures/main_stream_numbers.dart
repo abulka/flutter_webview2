@@ -13,7 +13,23 @@ class MyApp extends StatelessWidget {
     return new MaterialApp(
       home: Scaffold(
           appBar: AppBar(title: Text('Display Numbers stream in UI')),
-          body: NumbersDisplay2()),
+          body: Page()),
+    );
+  }
+}
+
+class Page extends StatelessWidget {
+  const Page({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(child: NumbersDisplay()),
+        Expanded(child: NumbersDisplay2()),
+      ],
     );
   }
 }
@@ -46,6 +62,7 @@ class _NumbersDisplayState extends State<NumbersDisplay> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      color: Colors.amber[100],
       // child: Text('hi there'),
       child: _buildAll(),
     );
@@ -95,6 +112,7 @@ class _NumbersDisplay2State extends State<NumbersDisplay2> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      color: Colors.amber[50],
       child: _buildAll(),
     );
   }
