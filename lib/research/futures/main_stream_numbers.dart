@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 import 'streams_research.dart';
 
-// Display Numbers stream in UI - update as we watch
+/* 
+  Display Numbers stream in UI
+  
+  Two versions 
+    - update listview as we watch
+    - wait till list fills then display (future builder used)
+
+  To get them to use the same number stream would be the next step.
+*/
 
 void main() {
   runApp(new MyApp());
@@ -34,7 +42,12 @@ class Page extends StatelessWidget {
   }
 }
 
-// Displays as we go...
+// Common stream both implementations listen to
+
+// final myStream = NumberCreator().stream.asBroadcastStream();
+final myStream = timedCounter(Duration(seconds: 1), 7).asBroadcastStream();
+
+// Implementation 1 - listview displays as we go...
 
 class NumbersDisplay extends StatefulWidget {
   NumbersDisplay({Key key}) : super(key: key);
@@ -44,7 +57,7 @@ class NumbersDisplay extends StatefulWidget {
 }
 
 class _NumbersDisplayState extends State<NumbersDisplay> {
-  List<int> numbersReceived = [1, 2, 3, 444, 555, 666];
+  List<int> numbersReceived = [];
   @override
   initState() {
     _listenToData();
@@ -52,7 +65,8 @@ class _NumbersDisplayState extends State<NumbersDisplay> {
   }
 
   _listenToData() {
-    timedCounter(Duration(seconds: 1), 7).listen((number) {
+    // timedCounter(Duration(seconds: 1), 7).listen((number) {
+    myStream.listen((number) {
       setState(() {
         numbersReceived.add(number);
       });
@@ -77,7 +91,7 @@ class _NumbersDisplayState extends State<NumbersDisplay> {
   }
 }
 
-// Displays once we get all the values using a future builder...
+// Implementation 2 - Displays once we get all the values using a future builder...
 
 class NumbersDisplay2 extends StatefulWidget {
   NumbersDisplay2({Key key}) : super(key: key);
@@ -93,13 +107,14 @@ class _NumbersDisplay2State extends State<NumbersDisplay2> {
   void initState() {
     super.initState();
     // numbersReceived = gatherNumbers();
-    numbersReceived = gatherNumbersIntoList(timedCounter(Duration(seconds: 1), 4));
+    numbersReceived =
+        gatherNumbersIntoList(myStream);
   }
 
-  Future<List<int>> gatherNumbers() async {
-    await Future.delayed(Duration(seconds: 2)); // wait 2 sec
-    return [42, 43, 55];
-  }
+  // Future<List<int>> gatherNumbers() async {
+  //   await Future.delayed(Duration(seconds: 2)); // wait 2 sec
+  //   return [42, 43, 55];
+  // }
 
   Future<List<int>> gatherNumbersIntoList(Stream<int> stream) async {
     List<int> numbersReceived = [];
