@@ -24,6 +24,10 @@
 */
 
 void main() async {
+
+  // All the following use async, which still runs the counters in the same
+  // thread thus doesn't help with counting to 1 billion.
+
   Future<String> futureString = fetchUserOrder();
   String s = await futureString;
   print(s);
@@ -81,6 +85,7 @@ Future<String> playHideAndSeek2() async {
   return '$counting! Ready or not, here I come!';
 }
 
+/// This returns nothing (void)
 Future<void> playHideAndSeek3() async {
   var counting = 0;
   for (var i = 1; i <= 30000000; i++) {
@@ -89,3 +94,15 @@ Future<void> playHideAndSeek3() async {
   print('playHideAndSeek3 $counting! Ready or not, here I come!');
 }
 
+/*
+ Official Interview question answer: It blocks your app because counting to ten
+ billion is a computationally expensive task, even for a computer. Dart code
+ runs inside its own area of memory called an isolate — also known as memory
+ thread. Each isolate has its own memory heap, which ensures that no isolate can
+ access any other isolate's state.
+
+ Making it an async function wouldn't help, either, because it would still run
+ on the same isolate.
+ */
+
+// See futures_vs_isolates.dart
