@@ -1,6 +1,4 @@
-import "dart:async";
 import "dart:isolate";
-
 import 'dart:math';
 
 // https://stackoverflow.com/questions/31013229/how-to-use-results-from-different-isolates-in-the-main-isolate

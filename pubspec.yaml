@@ -38,6 +38,7 @@ dependencies:
   http: ^0.12.2
   dedent: any
   isolate: ^2.0.3
+  crypto: any
 
 dev_dependencies:
   flutter_test:
