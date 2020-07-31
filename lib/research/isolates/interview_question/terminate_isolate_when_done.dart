@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
+import 'package:dedent/dedent.dart';
+
 import 'playHideAndSeekIsolate.dart';
 import 'playHideAndSeekAsync.dart';
 
@@ -10,63 +12,39 @@ import 'playHideAndSeekAsync.dart';
 
   The async approach, which still runs the counters in the same
   thread thus doesn't help with counting to 1 billion.
+
+  Here I spawn the isolate first then continue with awaiting on the async
+  version. By the time the async version has finished, so has the isolate/thread
+  version! Both thus running in parallel.
+
+  The other big learning here is how to know when the isolate is finished
+  and kill it. By using a future based thing called Completer() I can 
+  control when this future completes myself - very cool!
 */
 
 Isolate isolate; // holds ref to isolate
 
-// ANDY ATTEMPT AT ISOLATE VERSION - abandoned since I can't
-// figure out how to gracefully exit once the isolate is done.
-
-// String returnValueFromIsolate;
-
-// void main() async {
-//   // Isolate version - runs in separate thread
-//   await start(); // 'await' applied to 'void', which is not a 'Future' ?
-
-//   // Async, which still runs the counters in the same
-//   // thread thus doesn't help with counting to 1 billion.
-//   String s = await playHideAndSeekTheLongVersion();
-//   print(s);
-
-//   // if (returnValueFromIsolate != null) {
-//   //   stop();
-//   //   exit(0); // why do I need an explicit exit - otherwise app hangs?
-//   // } else
-//   //   print('isolate has not finished, we are left hanging');
-//   //
-//   // await theIsolate;  <--- WE WANT SOMETHING LIKE THIS (aha see below)
-//   exit(0);
-// }
-
 void main() async {
   Future t = MyOperation().start();
-  print('isolate thread should now be computing...');
+  print('1. isolate thread should now be computing...');
   // await t; // uncomment if want the culumative times
 
   // Async, which still runs the counters in the same
   // thread thus doesn't help with counting to 1 billion.
-  print('main thread computing...');
+  print('2. async function in main thread computing...');
   String s = await playHideAndSeekTheLongVersionAsync();
+
+  print('');
   print(s);
 
   await t;
-  print(
-      'if both messages print at < their individual cumulative times the same time it means they ran in parallel ok');
+  print(dedent('''
+  
+      If both messages print at about the same time and < their individual
+      cumulative times THEN it means they ran in parallel ok :-)
+      '''));
   stop();
   exit(0);
-}
-
-void start() async {
-  ReceivePort receivePort =
-      ReceivePort(); //port for this main isolate to receive messages.
-  isolate = await Isolate.spawn(
-      playHideAndSeekTheLongVersionIsolate, receivePort.sendPort); // create it!
-
-  // interesting that the same .listen() pattern is used here
-  receivePort.listen((data) {
-    print('$data (from receivePort)');
-    stop(); // don't stop in here, doesn't seem to work
-  });
 }
 
 void stop() {
@@ -80,7 +58,7 @@ void stop() {
 /// https://api.dart.dev/stable/2.8.4/dart-async/Completer-class.html
 /// experiment - WORKS - it was a guess, but it works!
 class MyOperation {
-  Completer _completer = new Completer();
+  Completer _completer = Completer();
 
   Future<void> start() async {
     ReceivePort receivePort =
