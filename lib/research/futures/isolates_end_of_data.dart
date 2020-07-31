@@ -14,16 +14,16 @@ void entryPoint(List args) {
 }
 
 main() async {
-  Capability endOfData = Capability();
+  Capability endOfData = Capability(); // I think this is like a uuid or similar
   ReceivePort receivePort = ReceivePort();
   Isolate isolate =
       await Isolate.spawn(entryPoint, [receivePort.sendPort, endOfData]);
   receivePort.listen((data) {
     if (data == endOfData) {
-      print('got endOfData message');
+      print('got endOfData message $data ${data.runtimeType}');
       receivePort.close();
     } else {
-      print("received: $data");
+      print("received: $data ${data.runtimeType}");
     }
   }, onDone: () {
     print("done");

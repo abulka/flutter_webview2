@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
 // import 'package:flutter/foundation.dart';
@@ -20,7 +21,7 @@ void main1() async {
   String s;
 
   // Official interview question Isolate version - runs in separate thread -
-  // requires flutter due to its reliance on the magical compute() function 
+  // requires flutter due to its reliance on the magical compute() function
   // s = await makeSomeoneElseCountForMe();
   // print(s);
 
@@ -30,35 +31,56 @@ void main1() async {
   print(s);
 }
 
-// ASYNC version
+// ASYNC version - takes 29s to count to a billion - slower than isolate!
+// isolate version only takes 8s
 
 Future<String> playHideAndSeekTheLongVersion() async {
+  const billion = 10000000000; // why 28 secs ?
+  const easier = 1000000000; // 3 secs
   var counting = 0;
-  for (var i = 1; i <= 1000000; i++) {
+  // for (var i = 1; i <= billion; i++) {
+  for (var i = 1; i <= easier; i++) {
     counting = i;
   }
-  return '$counting! Ready or not, here I come!';
+  return '  PLAIN ASYNC VERSION $counting! Ready or not, here I come!';
 }
 
 // ANDY ATTEMPT AT ISOLATE VERSION - abandoned since I can't
 // figure out how to gracefully exit once the isolate is done.
 
+// void main() async {
+//   // Isolate version - runs in separate thread
+//   await start(); // 'await' applied to 'void', which is not a 'Future' ?
+
+//   // Async, which still runs the counters in the same
+//   // thread thus doesn't help with counting to 1 billion.
+//   String s = await playHideAndSeekTheLongVersion();
+//   print(s);
+
+//   // if (returnValueFromIsolate != null) {
+//   //   stop();
+//   //   exit(0); // why do I need an explicit exit - otherwise app hangs?
+//   // } else
+//   //   print('isolate has not finished, we are left hanging');
+//   //
+//   // await theIsolate;  <--- WE WANT SOMETHING LIKE THIS (aha see below)
+//   exit(0);
+// }
+
 void main() async {
-  // Isolate version - runs in separate thread
-  await start(); // 'await' applied to 'void', which is not a 'Future' ?
+  Future t = MyOperation().start();
+  print('isolate thread should now be computing...');
+  // await t; // uncomment if want the culumative times
 
   // Async, which still runs the counters in the same
   // thread thus doesn't help with counting to 1 billion.
+  print('main thread computing...');
   String s = await playHideAndSeekTheLongVersion();
   print(s);
 
-  // if (returnValueFromIsolate != null) {
-  //   stop();
-  //   exit(0); // why do I need an explicit exit - otherwise app hangs?
-  // } else
-  //   print('isolate has not finished, we are left hanging');
-  //
-  // await theIsolate;  <--- WE WANT SOMETHING LIKE THIS
+  await t;
+  print('if both messages print at < their individual cumulative times the same time it means they ran in parallel ok');
+  stop();
   exit(0);
 }
 
@@ -70,7 +92,7 @@ void start() async {
 
   // interesting that the same .listen() pattern is used here
   receivePort.listen((data) {
-    print('Main process RECEIVES: ' + data + ', ');
+    print('$data (from receivePort)');
     stop(); // don't stop in here, doesn't seem to work
   });
 }
@@ -84,18 +106,48 @@ void stop() {
 }
 
 /// Isolate version is not async, returns void,
-/// and take SendPort sendPort as parameter.
-/// Don't return, send a message instead
+/// and takes SendPort sendPort as parameter.
+/// Don't return, send a message instead.
 void playHideAndSeekTheLongVersionIsolate(SendPort sendPort) {
   var counting = 0;
-  // for (var i = 1; i <= 10000000000; i++) {
-  // for (var i = 1; i <= 10000000; i++) {
-  for (var i = 1; i <= 1000000000; i++) {
+  for (var i = 1; i <= 10000000000; i++) {
+    // for (var i = 1; i <= 10000000; i++) {
+    // for (var i = 1; i <= 1000000000; i++) {
     counting = i;
   }
   // return '$counting! Ready or not, here I come!';
-  sendPort.send('$counting (isolated)! Ready or not, here I come!');
-  // isolate.addOnExitListener(sendPort, () => exit(0););
+  sendPort
+      .send('  ISOLATE VERSION $counting! Ready or not, here I come!');
+}
+
+/// https://api.dart.dev/stable/2.8.4/dart-async/Completer-class.html
+/// experiment - WORKS - it was a guess, but it works!
+class MyOperation {
+  Completer _completer = new Completer();
+
+  Future<void> start() async {
+    ReceivePort receivePort =
+        ReceivePort(); //port for this main isolate to receive messages.
+    isolate = await Isolate.spawn(playHideAndSeekTheLongVersionIsolate,
+        receivePort.sendPort); // create it!
+
+    receivePort.listen((data) {
+      print('$data (from receivePort) (MyOperation)');
+      _finishOperation();
+    });
+    return _completer.future; // Send future object back to client.
+  }
+
+  // Something calls this when the value is ready.
+  void _finishOperation() {
+    // _completer.complete(result);
+    _completer.complete();
+  }
+
+  // // If something goes wrong, call this.
+  // void _errorHappened(error) {
+  //   _completer.completeError(error);
+  // }
 }
 
 // Official Interview question answer:
